@@ -1,0 +1,42 @@
+<?php
+session_start();
+require_once 'db.php';
+
+if ($_POST) {
+    $email_or_username = trim($_POST['email']);
+    $password = $_POST['password'];
+    
+    // Simple validation
+    if (empty($email_or_username) || empty($password)) {
+        die("Please fill in all fields!");
+    }
+    
+    try {
+        // Check if user exists (by email or username)
+        $stmt = $pdo->prepare("SELECT id, username, email, password FROM users WHERE email = ? OR username = ?");
+        $stmt->execute([$email_or_username, $email_or_username]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($user && password_verify($password, $user['password'])) {
+            // Login successful
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['email'] = $user['email'];
+            
+            echo "<script>
+                    alert('Login successful! Welcome back!');
+                    window.location.href = 'dashboard.php';
+                  </script>";
+        } else {
+            // Login failed
+            echo "<script>
+                    alert('Invalid email/username or password!');
+                    window.location.href = 'loginpage.html';
+                  </script>";
+        }
+        
+    } catch(PDOException $e) {
+        die("Login error: " . $e->getMessage());
+    }
+}
+?>
