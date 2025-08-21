@@ -286,7 +286,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
                     <a href="#" class="read-more">Read Full Story →</a>
                 </div>
                 <div class="featured-image">
-                    🎮
+                    <img src="gamingcnfrn.jpg">
                 </div>
             </div>
 
