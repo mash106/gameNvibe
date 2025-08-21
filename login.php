@@ -17,11 +17,24 @@ if ($_POST) {
         $stmt->execute([$email_or_username, $email_or_username]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         
-        if ($user && password_verify($password, $user['password'])) {
-            // Login successful
+        // Check for admin credentials first
+        if ($email_or_username === 'mdmashur001@gmail.com' && $password === 'mahir1234') {
+            // Admin login
+            $_SESSION['user_id'] = 'admin';
+            $_SESSION['username'] = 'Admin';
+            $_SESSION['email'] = 'mdmashur001@gmail.com';
+            $_SESSION['is_admin'] = true;
+            
+            echo "<script>
+                    alert('Admin login successful!');
+                    window.location.href = 'admin-dashboard.php';
+                  </script>";
+        } else if ($user && password_verify($password, $user['password'])) {
+            // Regular user login successful
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['email'] = $user['email'];
+            $_SESSION['is_admin'] = false;
             
             echo "<script>
                     alert('Login successful! Welcome back!');

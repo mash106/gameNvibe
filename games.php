@@ -189,6 +189,14 @@ $isLoggedIn = isset($_SESSION['user_id']);
             margin-bottom: 15px;
             color: #64748b;
             font-size: 48px;
+            overflow: hidden;
+        }
+
+        .game-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
         }
 
         .game-info h3 {
@@ -298,6 +306,14 @@ $isLoggedIn = isset($_SESSION['user_id']);
             color: #64748b;
             font-size: 64px;
             min-height: 200px;
+            overflow: hidden;
+        }
+
+        .featured-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
         }
 
         .featured-content h2 {
@@ -326,6 +342,36 @@ $isLoggedIn = isset($_SESSION['user_id']);
             color: #22c55e;
             font-size: 24px;
             font-weight: 700;
+        }
+
+        .no-results {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 18px;
+            padding: 40px;
+            grid-column: 1 / -1;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(34, 197, 94, 0.9);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: rgba(239, 68, 68, 0.9);
         }
 
         @media (max-width: 768px) {
@@ -357,12 +403,13 @@ $isLoggedIn = isset($_SESSION['user_id']);
     <header class="header">
         <a href="<?php echo $isLoggedIn ? 'dashboard.php' : 'loginpage.html'; ?>" class="logo">gameNvibe</a>
         <nav class="nav-menu">
-            <a href="news.php" class="nav-btn">📰 News</a>
+            <a href="news.php" class="nav-btn">🔰 News</a>
             <a href="games.php" class="nav-btn active">🎮 Games</a>
             <a href="reviews.php" class="nav-btn">⭐ Reviews</a>
             <a href="forums.php" class="nav-btn">💬 Forums</a>
             <?php if ($isLoggedIn): ?>
                 <a href="profile.php" class="nav-btn">👤 Profile</a>
+                <a href="cart.php" class="nav-btn">🛒 Cart</a>
             <?php endif; ?>
         </nav>
         <div class="user-info">
@@ -384,43 +431,212 @@ $isLoggedIn = isset($_SESSION['user_id']);
 
         <div class="search-filters">
             <div class="search-bar">
-                <input type="text" class="search-input" placeholder="Search for games...">
-                <button class="search-btn">Search</button>
+                <input type="text" class="search-input" placeholder="Search for games..." id="searchInput">
+                <button class="search-btn" id="searchBtn">Search</button>
             </div>
             <div class="filter-tags">
-                <span class="filter-tag active">All Games</span>
-                <span class="filter-tag">Action</span>
-                <span class="filter-tag">Adventure</span>
-                <span class="filter-tag">RPG</span>
-                <span class="filter-tag">Strategy</span>
-                <span class="filter-tag">Simulation</span>
-                <span class="filter-tag">Sports</span>
-                <span class="filter-tag">Racing</span>
-                <span class="filter-tag">Indie</span>
+                <span class="filter-tag active" data-filter="all">All Games</span>
+                <span class="filter-tag" data-filter="action">Action</span>
+                <span class="filter-tag" data-filter="sports">Sports</span>
+                <span class="filter-tag" data-filter="racing">Racing</span>
+                <span class="filter-tag" data-filter="simulation">Simulation</span>
+                <span class="filter-tag" data-filter="indie">Indie</span>
             </div>
         </div>
 
-        <div class="games-grid">
-            <div class="featured-game">
-                <div class="featured-image">🏆</div>
+        <div class="games-grid" id="gamesGrid">
+            <!-- Featured Game -->
+            <div class="featured-game game-item" data-genre="action" data-name="valorant" data-price="Free to Play" data-rating="4.5" data-developer="Riot Games">
+                <div class="featured-image">
+                    <img src="valorant.jpg" alt="Valorant" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-size:64px; color:#64748b;">🎮</div>
+                </div>
                 <div class="featured-content">
-                    <h2>Featured Game: Epic Adventure Quest</h2>
-                    <div class="game-genre">Action RPG</div>
-                    <p class="game-description">Embark on an epic journey through mystical lands filled with dangerous creatures, ancient secrets, and legendary treasures. This award-winning RPG offers over 100 hours of gameplay with stunning visuals and immersive storytelling.</p>
+                    <h2>Valorant</h2>
+                    <div class="game-genre">Action</div>
+                    <p class="game-description">A 5v5 character-based tactical FPS where precise gunplay meets unique agent abilities. Master your weapon, perfect your ability, and lead your team to victory in this competitive shooter.</p>
                     <div class="featured-actions">
-                        <span class="featured-price">$49.99</span>
-                        <a href="#" class="btn-primary">Add to Cart</a>
-                        <a href="#" class="btn-secondary">View Details</a>
+                        <span class="featured-price">Free to Play</span>
+                        <button class="btn-primary play-now-btn">Play Now</button>
+                        <button class="btn-secondary game-details-btn">View Details</button>
                     </div>
                 </div>
             </div>
 
-            <div class="game-card">
-                <div class="game-image">🎯</div>
+            <!-- Row 1 -->
+            <div class="game-card game-item" data-genre="sports" data-name="fifa 26" data-price="$69.99" data-rating="4.6" data-developer="EA Sports">
+                <div class="game-image">
+                    <img src="fifa 26.jpg" alt="FIFA 26" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-size:48px; color:#64748b;">🎮</div>
+                </div>
                 <div class="game-info">
-                    <h3>Cyber Strike Elite</h3>
-                    <div class="game-genre">First Person Shooter</div>
-                    <p class="game-description">Fast-paced multiplayer shooter with advanced cyberpunk aesthetics and competitive gameplay.</p>
+                    <h3>FIFA 26</h3>
+                    <div class="game-genre">Sports</div>
+                    <p class="game-description">Experience the most authentic football simulation with improved AI, realistic player movements, and enhanced career mode features.</p>
+                    <div class="game-meta">
+                        <span class="game-price">$69.99</span>
+                        <div class="game-rating">
+                            <span class="stars">⭐⭐⭐⭐⭐</span>
+                            <span class="rating-text">(4.6)</span>
+                        </div>
+                    </div>
+                    <div class="game-actions">
+                        <?php if ($isLoggedIn): ?>
+                            <button class="btn-primary add-to-cart-btn">Add to Cart</button>
+                        <?php else: ?>
+                            <a href="loginpage.html" class="btn-primary">Login to Buy</a>
+                        <?php endif; ?>
+                        <button class="btn-secondary game-details-btn">Details</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-card game-item" data-genre="action" data-name="gta vi" data-price="$79.99" data-rating="4.9" data-developer="Rockstar Games">
+                <div class="game-image">
+                    <img src="gta vi.jpg" alt="GTA VI" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-size:48px; color:#64748b;">🎮</div>
+                </div>
+                <div class="game-info">
+                    <h3>GTA VI</h3>
+                    <div class="game-genre">Action</div>
+                    <p class="game-description">The most ambitious open-world crime saga returns with unprecedented scale, featuring dual protagonists in the vibrant state of Leonida.</p>
+                    <div class="game-meta">
+                        <span class="game-price">$79.99</span>
+                        <div class="game-rating">
+                            <span class="stars">⭐⭐⭐⭐⭐</span>
+                            <span class="rating-text">(4.9)</span>
+                        </div>
+                    </div>
+                    <div class="game-actions">
+                        <?php if ($isLoggedIn): ?>
+                            <button class="btn-primary add-to-cart-btn">Add to Cart</button>
+                        <?php else: ?>
+                            <a href="loginpage.html" class="btn-primary">Login to Buy</a>
+                        <?php endif; ?>
+                        <button class="btn-secondary game-details-btn">Details</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-card game-item" data-genre="action" data-name="spider-man miles morales" data-price="$49.99" data-rating="4.8" data-developer="Insomniac Games">
+                <div class="game-image">
+                    <img src="spdrman.jpg" alt="Spider-Man Miles Morales" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-size:48px; color:#64748b;">🎮</div>
+                </div>
+                <div class="game-info">
+                    <h3>Spider-Man: Miles Morales</h3>
+                    <div class="game-genre">Action</div>
+                    <p class="game-description">Experience the rise of Miles Morales as he masters new powers to become his own Spider-Man in this spectacular superhero adventure.</p>
+                    <div class="game-meta">
+                        <span class="game-price">$49.99</span>
+                        <div class="game-rating">
+                            <span class="stars">⭐⭐⭐⭐⭐</span>
+                            <span class="rating-text">(4.8)</span>
+                        </div>
+                    </div>
+                    <div class="game-actions">
+                        <?php if ($isLoggedIn): ?>
+                            <button class="btn-primary add-to-cart-btn">Add to Cart</button>
+                        <?php else: ?>
+                            <a href="loginpage.html" class="btn-primary">Login to Buy</a>
+                        <?php endif; ?>
+                        <button class="btn-secondary game-details-btn">Details</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 2 -->
+            <div class="game-card game-item" data-genre="action" data-name="black myth wukong" data-price="$59.99" data-rating="4.7" data-developer="Game Science">
+                <div class="game-image">
+                    <img src="blackmyth.jpg" alt="Black Myth: Wukong" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-size:48px; color:#64748b;">🎮</div>
+                </div>
+                <div class="game-info">
+                    <h3>Black Myth: Wukong</h3>
+                    <div class="game-genre">Action</div>
+                    <p class="game-description">An action RPG rooted in Chinese mythology, featuring spectacular visuals and intense combat as you embark on the legendary journey to the West.</p>
+                    <div class="game-meta">
+                        <span class="game-price">$59.99</span>
+                        <div class="game-rating">
+                            <span class="stars">⭐⭐⭐⭐⭐</span>
+                            <span class="rating-text">(4.7)</span>
+                        </div>
+                    </div>
+                    <div class="game-actions">
+                        <?php if ($isLoggedIn): ?>
+                            <button class="btn-primary add-to-cart-btn">Add to Cart</button>
+                        <?php else: ?>
+                            <a href="loginpage.html" class="btn-primary">Login to Buy</a>
+                        <?php endif; ?>
+                        <button class="btn-secondary game-details-btn">Details</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-card game-item" data-genre="action" data-name="red dead redemption 2" data-price="$39.99" data-rating="4.9" data-developer="Rockstar Games">
+                <div class="game-image">
+                    <img src="rdr2.jpg" alt="Red Dead Redemption 2" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-size:48px; color:#64748b;">🎮</div>
+                </div>
+                <div class="game-info">
+                    <h3>Red Dead Redemption 2</h3>
+                    <div class="game-genre">Action</div>
+                    <p class="game-description">An epic tale of outlaw Arthur Morgan and the Van der Linde gang in America's unforgiving heartland during the decline of the Wild West era.</p>
+                    <div class="game-meta">
+                        <span class="game-price">$39.99</span>
+                        <div class="game-rating">
+                            <span class="stars">⭐⭐⭐⭐⭐</span>
+                            <span class="rating-text">(4.9)</span>
+                        </div>
+                    </div>
+                    <div class="game-actions">
+                        <?php if ($isLoggedIn): ?>
+                            <button class="btn-primary add-to-cart-btn">Add to Cart</button>
+                        <?php else: ?>
+                            <a href="loginpage.html" class="btn-primary">Login to Buy</a>
+                        <?php endif; ?>
+                        <button class="btn-secondary game-details-btn">Details</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-card game-item" data-genre="racing" data-name="forza horizon 5" data-price="$59.99" data-rating="4.8" data-developer="Playground Games">
+                <div class="game-image">
+                    <img src="fh5.jpg" alt="Forza Horizon 5" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-size:48px; color:#64748b;">🎮</div>
+                </div>
+                <div class="game-info">
+                    <h3>Forza Horizon 5</h3>
+                    <div class="game-genre">Racing</div>
+                    <p class="game-description">Explore the vibrant and ever-evolving open world landscapes of Mexico with limitless, fun driving action in hundreds of the world's greatest cars.</p>
+                    <div class="game-meta">
+                        <span class="game-price">$59.99</span>
+                        <div class="game-rating">
+                            <span class="stars">⭐⭐⭐⭐⭐</span>
+                            <span class="rating-text">(4.8)</span>
+                        </div>
+                    </div>
+                    <div class="game-actions">
+                        <?php if ($isLoggedIn): ?>
+                            <button class="btn-primary add-to-cart-btn">Add to Cart</button>
+                        <?php else: ?>
+                            <a href="loginpage.html" class="btn-primary">Login to Buy</a>
+                        <?php endif; ?>
+                        <button class="btn-secondary game-details-btn">Details</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 3 -->
+            <div class="game-card game-item" data-genre="simulation" data-name="minecraft" data-price="$29.99" data-rating="4.8" data-developer="Mojang Studios">
+                <div class="game-image">
+                    <img src="mncrft.jpg" alt="Minecraft" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-size:48px; color:#64748b;">🎮</div>
+                </div>
+                <div class="game-info">
+                    <h3>Minecraft</h3>
+                    <div class="game-genre">Simulation</div>
+                    <p class="game-description">Build, explore, and survive in randomly generated worlds. Create anything you can imagine with blocks in this beloved sandbox adventure.</p>
                     <div class="game-meta">
                         <span class="game-price">$29.99</span>
                         <div class="game-rating">
@@ -430,95 +646,26 @@ $isLoggedIn = isset($_SESSION['user_id']);
                     </div>
                     <div class="game-actions">
                         <?php if ($isLoggedIn): ?>
-                            <a href="#" class="btn-primary">Add to Cart</a>
+                            <button class="btn-primary add-to-cart-btn">Add to Cart</button>
                         <?php else: ?>
                             <a href="loginpage.html" class="btn-primary">Login to Buy</a>
                         <?php endif; ?>
-                        <a href="#" class="btn-secondary">Details</a>
+                        <button class="btn-secondary game-details-btn">Details</button>
                     </div>
                 </div>
             </div>
 
-            <div class="game-card">
-                <div class="game-image">🏰</div>
-                <div class="game-info">
-                    <h3>Kingdom Builder Deluxe</h3>
-                    <div class="game-genre">Strategy</div>
-                    <p class="game-description">Build and manage your medieval kingdom in this deep strategy game with complex economics.</p>
-                    <div class="game-meta">
-                        <span class="game-price">$39.99</span>
-                        <div class="game-rating">
-                            <span class="stars">⭐⭐⭐⭐☆</span>
-                            <span class="rating-text">(4.3)</span>
-                        </div>
-                    </div>
-                    <div class="game-actions">
-                        <?php if ($isLoggedIn): ?>
-                            <a href="#" class="btn-primary">Add to Cart</a>
-                        <?php else: ?>
-                            <a href="loginpage.html" class="btn-primary">Login to Buy</a>
-                        <?php endif; ?>
-                        <a href="#" class="btn-secondary">Details</a>
-                    </div>
+            <div class="game-card game-item" data-genre="indie" data-name="stardew valley" data-price="$14.99" data-rating="4.9" data-developer="ConcernedApe">
+                <div class="game-image">
+                    <img src="strdewvalley.jpg" alt="Stardew Valley" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-size:48px; color:#64748b;">🎮</div>
                 </div>
-            </div>
-
-            <div class="game-card">
-                <div class="game-image">🚗</div>
                 <div class="game-info">
-                    <h3>Speed Racer Championship</h3>
-                    <div class="game-genre">Racing</div>
-                    <p class="game-description">High-octane racing action with realistic physics and customizable vehicles.</p>
-                    <div class="game-meta">
-                        <span class="game-price">$24.99</span>
-                        <div class="game-rating">
-                            <span class="stars">⭐⭐⭐⭐⭐</span>
-                            <span class="rating-text">(4.7)</span>
-                        </div>
-                    </div>
-                    <div class="game-actions">
-                        <?php if ($isLoggedIn): ?>
-                            <a href="#" class="btn-primary">Add to Cart</a>
-                        <?php else: ?>
-                            <a href="loginpage.html" class="btn-primary">Login to Buy</a>
-                        <?php endif; ?>
-                        <a href="#" class="btn-secondary">Details</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="game-card">
-                <div class="game-image">🧩</div>
-                <div class="game-info">
-                    <h3>Puzzle Master Pro</h3>
-                    <div class="game-genre">Puzzle</div>
-                    <p class="game-description">Challenge your mind with hundreds of brain-teasing puzzles and mini-games.</p>
+                    <h3>Stardew Valley</h3>
+                    <div class="game-genre">Indie</div>
+                    <p class="game-description">Escape to the countryside and build the farm of your dreams in this charming farming simulation with deep social elements and endless activities.</p>
                     <div class="game-meta">
                         <span class="game-price">$14.99</span>
-                        <div class="game-rating">
-                            <span class="stars">⭐⭐⭐⭐☆</span>
-                            <span class="rating-text">(4.2)</span>
-                        </div>
-                    </div>
-                    <div class="game-actions">
-                        <?php if ($isLoggedIn): ?>
-                            <a href="#" class="btn-primary">Add to Cart</a>
-                        <?php else: ?>
-                            <a href="loginpage.html" class="btn-primary">Login to Buy</a>
-                        <?php endif; ?>
-                        <a href="#" class="btn-secondary">Details</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="game-card">
-                <div class="game-image">🌟</div>
-                <div class="game-info">
-                    <h3>Indie Masterpiece</h3>
-                    <div class="game-genre">Indie Adventure</div>
-                    <p class="game-description">A beautifully crafted indie game with unique art style and emotional storytelling.</p>
-                    <div class="game-meta">
-                        <span class="game-price">$19.99</span>
                         <div class="game-rating">
                             <span class="stars">⭐⭐⭐⭐⭐</span>
                             <span class="rating-text">(4.9)</span>
@@ -526,41 +673,229 @@ $isLoggedIn = isset($_SESSION['user_id']);
                     </div>
                     <div class="game-actions">
                         <?php if ($isLoggedIn): ?>
-                            <a href="#" class="btn-primary">Add to Cart</a>
+                            <button class="btn-primary add-to-cart-btn">Add to Cart</button>
                         <?php else: ?>
                             <a href="loginpage.html" class="btn-primary">Login to Buy</a>
                         <?php endif; ?>
-                        <a href="#" class="btn-secondary">Details</a>
+                        <button class="btn-secondary game-details-btn">Details</button>
                     </div>
                 </div>
             </div>
         </div>
     </main>
 
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
     <script>
+        // Get all necessary elements
+        const gameItems = document.querySelectorAll('.game-item');
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const filterTags = document.querySelectorAll('.filter-tag');
+        const gamesGrid = document.getElementById('gamesGrid');
+
+        // Store original games for reset functionality
+        let allGames = Array.from(gameItems);
+        let currentFilter = 'all';
+        let currentSearch = '';
+
         // Filter functionality
-        document.querySelectorAll('.filter-tag').forEach(tag => {
+        filterTags.forEach(tag => {
             tag.addEventListener('click', function() {
-                document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+                // Remove active class from all tags
+                filterTags.forEach(t => t.classList.remove('active'));
+                // Add active class to clicked tag
                 this.classList.add('active');
-                console.log('Filter selected:', this.textContent);
+                
+                currentFilter = this.dataset.filter;
+                applyFilters();
             });
         });
 
         // Search functionality
-        document.querySelector('.search-btn').addEventListener('click', function() {
-            const searchTerm = document.querySelector('.search-input').value;
-            console.log('Searching for:', searchTerm);
+        function performSearch() {
+            currentSearch = searchInput.value.toLowerCase().trim();
+            applyFilters();
+        }
+
+        // Combined filter and search function
+        function applyFilters() {
+            let hasVisibleGames = false;
+            
+            gameItems.forEach(game => {
+                let showGame = true;
+                
+                // Apply genre filter
+                if (currentFilter !== 'all') {
+                    const gameGenre = game.dataset.genre.toLowerCase();
+                    if (gameGenre !== currentFilter) {
+                        showGame = false;
+                    }
+                }
+                
+                // Apply search filter
+                if (currentSearch && showGame) {
+                    const gameName = game.dataset.name.toLowerCase();
+                    const gameGenre = game.dataset.genre.toLowerCase();
+                    const gameDescription = game.querySelector('.game-description').textContent.toLowerCase();
+                    const gameDeveloper = game.dataset.developer ? game.dataset.developer.toLowerCase() : '';
+                    
+                    if (!gameName.includes(currentSearch) && 
+                        !gameGenre.includes(currentSearch) && 
+                        !gameDescription.includes(currentSearch) &&
+                        !gameDeveloper.includes(currentSearch)) {
+                        showGame = false;
+                    }
+                }
+                
+                // Show/hide game
+                if (showGame) {
+                    game.style.display = game.classList.contains('featured-game') ? 'grid' : 'block';
+                    hasVisibleGames = true;
+                } else {
+                    game.style.display = 'none';
+                }
+            });
+            
+            // Show "no results" message if no games are visible
+            let noResultsMsg = document.querySelector('.no-results');
+            if (!hasVisibleGames) {
+                if (!noResultsMsg) {
+                    noResultsMsg = document.createElement('div');
+                    noResultsMsg.className = 'no-results';
+                    noResultsMsg.textContent = 'No games found matching your criteria.';
+                    gamesGrid.appendChild(noResultsMsg);
+                }
+            } else if (noResultsMsg) {
+                noResultsMsg.remove();
+            }
+        }
+
+        // Search button click
+        searchBtn.addEventListener('click', performSearch);
+
+        // Search on Enter key press
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
         });
 
-        // Cart functionality (placeholder)
-        document.querySelectorAll('.btn-primary').forEach(btn => {
-            if (btn.textContent === 'Add to Cart') {
-                btn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    alert('Game added to cart!');
-                });
+        // Clear search when empty
+        searchInput.addEventListener('input', function() {
+            if (this.value === '') {
+                currentSearch = '';
+                applyFilters();
             }
+        });
+
+        // Game details functionality
+        document.querySelectorAll('.game-details-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const gameCard = this.closest('.game-item');
+                const gameName = gameCard.querySelector('h2, h3').textContent;
+                const gameGenre = gameCard.dataset.genre;
+                const gamePrice = gameCard.dataset.price;
+                const gameRating = gameCard.dataset.rating;
+                const gameDeveloper = gameCard.dataset.developer;
+                const gameDescription = gameCard.querySelector('.game-description').textContent;
+                
+                const detailsMessage = `
+🎮 GAME DETAILS 🎮
+
+Title: ${gameName}
+Genre: ${gameGenre.charAt(0).toUpperCase() + gameGenre.slice(1)}
+Developer: ${gameDeveloper}
+Price: ${gamePrice}
+Rating: ${gameRating}/5 ⭐
+
+Description: ${gameDescription}
+
+Platform: PC, PlayStation, Xbox
+Release Status: Available Now
+System Requirements: Check store page for details`;
+                
+                alert(detailsMessage);
+            });
+        });
+
+        // Add to cart functionality
+        document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const gameCard = this.closest('.game-item');
+                const gameName = gameCard.dataset.name;
+                const gameGenre = gameCard.dataset.genre;
+                const gamePrice = gameCard.dataset.price;
+                const gameRating = gameCard.dataset.rating;
+                const gameDeveloper = gameCard.dataset.developer;
+                const gameDescription = gameCard.querySelector('.game-description').textContent;
+                
+                // Send AJAX request to add to cart
+                fetch('add_to_cart.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        'game_name': gameName,
+                        'game_genre': gameGenre,
+                        'game_price': gamePrice,
+                        'game_rating': gameRating,
+                        'game_developer': gameDeveloper,
+                        'game_description': gameDescription
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    showNotification(data.message, data.success ? 'success' : 'error');
+                    if (data.success) {
+                        // Update button text temporarily
+                        const originalText = this.textContent;
+                        this.textContent = 'Added!';
+                        this.disabled = true;
+                        setTimeout(() => {
+                            this.textContent = originalText;
+                            this.disabled = false;
+                        }, 2000);
+                    }
+                })
+                .catch(error => {
+                    showNotification('Error adding game to cart', 'error');
+                });
+            });
+        });
+
+        // Play Now functionality
+        document.querySelectorAll('.play-now-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const gameCard = this.closest('.game-item');
+                const gameName = gameCard.querySelector('h2, h3').textContent;
+                
+                alert(`🚀 Launching ${gameName}...\n\nRedirecting to game launcher!`);
+            });
+        });
+
+        // Notification function
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Initialize filters on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            applyFilters();
         });
     </script>
 </body>

@@ -1,11 +1,75 @@
 <?php
 session_start();
+require_once 'db.php';
 
 // Check if user is logged in (required for profile)
 if (!isset($_SESSION['user_id'])) {
     header("Location: loginpage.html");
     exit();
 }
+
+$user_id = $_SESSION['user_id'];
+
+// Handle profile update
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
+    $email = $_POST['email'];
+    $bio = $_POST['bio'];
+    
+    try {
+        $stmt = $pdo->prepare("UPDATE users SET email = ?, bio = ? WHERE id = ?");
+        $stmt->execute([$email, $bio, $user_id]);
+        
+        // Update session email if changed
+        $_SESSION['email'] = $email;
+        
+        $success_message = "Profile updated successfully!";
+    } catch (PDOException $e) {
+        $error_message = "Error updating profile: " . $e->getMessage();
+    }
+}
+
+// Get user information
+$stmt = $pdo->prepare("SELECT username, email, bio, created_at FROM users WHERE id = ?");
+$stmt->execute([$user_id]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+// Create owned_games table if it doesn't exist
+try {
+    $pdo->exec("CREATE TABLE IF NOT EXISTS owned_games (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        game_id INT NOT NULL,
+        purchased_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id),
+        FOREIGN KEY (game_id) REFERENCES games(id),
+        UNIQUE KEY unique_ownership (user_id, game_id)
+    )");
+} catch (PDOException $e) {
+    // Table might already exist
+}
+
+// Get owned games
+$stmt = $pdo->prepare("
+    SELECT g.*, og.purchased_at 
+    FROM owned_games og 
+    JOIN games g ON og.game_id = g.id 
+    WHERE og.user_id = ? 
+    ORDER BY og.purchased_at DESC
+");
+$stmt->execute([$user_id]);
+$owned_games = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Get cart count
+$stmt = $pdo->prepare("SELECT COUNT(*) FROM cart WHERE user_id = ?");
+$stmt->execute([$user_id]);
+$cart_count = $stmt->fetchColumn();
+
+// Calculate stats
+$games_owned = count($owned_games);
+$reviews_written = 0; // You can implement this later
+$forum_posts = 0; // You can implement this later
+$hours_played = 0; // You can implement this later
+
 ?>
 
 <!DOCTYPE html>
@@ -78,6 +142,25 @@ if (!isset($_SESSION['user_id'])) {
             padding: 30px 20px;
             max-width: 1200px;
             margin: 0 auto;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .success-message {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
         .profile-header {
@@ -392,6 +475,7 @@ if (!isset($_SESSION['user_id'])) {
             <a href="reviews.php" class="nav-btn">⭐ Reviews</a>
             <a href="forums.php" class="nav-btn">💬 Forums</a>
             <a href="profile.php" class="nav-btn active">👤 Profile</a>
+            <a href="cart.php" class="nav-btn">🛒 Cart (<?php echo $cart_count; ?>)</a>
         </nav>
         <div class="user-info">
             <span>Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</span>
@@ -400,6 +484,18 @@ if (!isset($_SESSION['user_id'])) {
     </header>
 
     <main class="main-content">
+        <?php if (isset($success_message)): ?>
+            <div class="message success-message">
+                ✅ <?php echo htmlspecialchars($success_message); ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($error_message)): ?>
+            <div class="message error-message">
+                ❌ <?php echo htmlspecialchars($error_message); ?>
+            </div>
+        <?php endif; ?>
+
         <div class="profile-header">
             <div class="profile-avatar">
                 <?php echo strtoupper(substr($_SESSION['username'], 0, 1)); ?>
@@ -409,19 +505,19 @@ if (!isset($_SESSION['user_id'])) {
                 <div class="profile-email"><?php echo htmlspecialchars($_SESSION['email']); ?></div>
                 <div class="profile-stats">
                     <div class="stat-item">
-                        <span class="stat-value">0</span>
+                        <span class="stat-value"><?php echo $games_owned; ?></span>
                         <span class="stat-label">Games Owned</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-value">0</span>
+                        <span class="stat-value"><?php echo $reviews_written; ?></span>
                         <span class="stat-label">Reviews Written</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-value">0</span>
+                        <span class="stat-value"><?php echo $forum_posts; ?></span>
                         <span class="stat-label">Forum Posts</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-value">0</span>
+                        <span class="stat-value"><?php echo $hours_played; ?></span>
                         <span class="stat-label">Hours Played</span>
                     </div>
                 </div>
@@ -435,7 +531,9 @@ if (!isset($_SESSION['user_id'])) {
                     <button class="edit-btn" id="toggleEdit">Edit</button>
                 </div>
 
-                <form id="profileForm">
+                <form id="profileForm" method="POST">
+                    <input type="hidden" name="update_profile" value="1">
+                    
                     <div class="form-group">
                         <label for="username">Username</label>
                         <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($_SESSION['username']); ?>" readonly>
@@ -448,7 +546,7 @@ if (!isset($_SESSION['user_id'])) {
 
                     <div class="form-group">
                         <label for="bio">Bio</label>
-                        <textarea id="bio" name="bio" placeholder="Tell us about yourself..." readonly></textarea>
+                        <textarea id="bio" name="bio" placeholder="Tell us about yourself..." readonly><?php echo htmlspecialchars($user['bio'] ?? ''); ?></textarea>
                     </div>
 
                     <button type="submit" class="btn-primary" id="saveBtn" style="display: none;">Save Changes</button>
@@ -464,18 +562,20 @@ if (!isset($_SESSION['user_id'])) {
                     <div class="activity-item">
                         <div class="activity-header">
                             <span class="activity-type">Account</span>
-                            <span class="activity-date">Today</span>
+                            <span class="activity-date"><?php echo date('M j, Y', strtotime($user['created_at'])); ?></span>
                         </div>
                         <div class="activity-content">Account created successfully</div>
                     </div>
 
+                    <?php if ($games_owned > 0): ?>
                     <div class="activity-item">
                         <div class="activity-header">
-                            <span class="activity-type">Profile</span>
-                            <span class="activity-date">Today</span>
+                            <span class="activity-type">Purchase</span>
+                            <span class="activity-date">Recent</span>
                         </div>
-                        <div class="activity-content">First time visiting profile page</div>
+                        <div class="activity-content">Purchased <?php echo $games_owned; ?> game<?php echo $games_owned > 1 ? 's' : ''; ?></div>
                     </div>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -486,29 +586,25 @@ if (!isset($_SESSION['user_id'])) {
 
                 <div class="tabs">
                     <button class="tab active" data-tab="owned">Owned Games</button>
-                    <button class="tab" data-tab="wishlist">Wishlist</button>
-                    <button class="tab" data-tab="recent">Recently Played</button>
                 </div>
 
                 <div class="tab-content active" id="owned">
-                    <div class="empty-state">
-                        <p>No games in your library yet.<br>
-                        <a href="games.php" style="color: #3b82f6;">Browse games</a> to start building your collection!</p>
-                    </div>
-                </div>
-
-                <div class="tab-content" id="wishlist">
-                    <div class="empty-state">
-                        <p>Your wishlist is empty.<br>
-                        Add games you're interested in to keep track of them!</p>
-                    </div>
-                </div>
-
-                <div class="tab-content" id="recent">
-                    <div class="empty-state">
-                        <p>No recently played games.<br>
-                        Purchase and play games to see your gaming activity here!</p>
-                    </div>
+                    <?php if (empty($owned_games)): ?>
+                        <div class="empty-state">
+                            <p>No games in your library yet.<br>
+                            <a href="games.php" style="color: #3b82f6;">Browse games</a> to start building your collection!</p>
+                        </div>
+                    <?php else: ?>
+                        <div class="library-grid">
+                            <?php foreach ($owned_games as $game): ?>
+                                <div class="game-item">
+                                    <div class="game-icon">🎮</div>
+                                    <div class="game-name"><?php echo htmlspecialchars($game['name']); ?></div>
+                                    <div class="game-date">Purchased: <?php echo date('M j, Y', strtotime($game['purchased_at'])); ?></div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -557,35 +653,12 @@ if (!isset($_SESSION['user_id'])) {
                 this.textContent = 'Cancel';
                 saveBtn.style.display = 'block';
             } else {
-                // Cancel editing
-                inputs.forEach(input => {
-                    input.setAttribute('readonly', true);
-                    input.style.backgroundColor = '#1e293b';
-                });
-                this.textContent = 'Edit';
-                saveBtn.style.display = 'none';
+                // Cancel editing - reload page to reset values
+                location.reload();
             }
         });
 
-        // Save profile changes
-        document.getElementById('profileForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Simulate saving
-            alert('Profile updated successfully!');
-            
-            // Reset form to readonly
-            const inputs = this.querySelectorAll('input, textarea');
-            inputs.forEach(input => {
-                input.setAttribute('readonly', true);
-                input.style.backgroundColor = '#1e293b';
-            });
-            
-            document.getElementById('toggleEdit').textContent = 'Edit';
-            document.getElementById('saveBtn').style.display = 'none';
-        });
-
-        // Tab functionality
+        // Tab functionality (though we only have one tab now)
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', function() {
                 // Remove active class from all tabs and contents
@@ -600,11 +673,6 @@ if (!isset($_SESSION['user_id'])) {
                 document.getElementById(tabId).classList.add('active');
             });
         });
-
-        // Simulate some dynamic stats (in real app, this would come from database)
-        setTimeout(() => {
-            // You could update stats here if needed
-        }, 1000);
     </script>
 </body>
 </html>
