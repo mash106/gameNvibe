@@ -76,7 +76,7 @@ $cartItems = rand(50, 150);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - gameNvibe</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -305,7 +305,128 @@ $cartItems = rand(50, 150);
                 gap: 20px;
                 text-align: center;
             }
+            
         }
+        .line-chart {
+    position: relative;
+    height: 200px;
+    background: linear-gradient(to top, rgba(59, 130, 246, 0.1) 0%, transparent 100%);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.line-chart svg {
+    width: 100%;
+    height: 100%;
+}
+
+.chart-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+/* Bar Chart Styles */
+.bar-chart {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    height: 200px;
+    padding: 20px 0;
+    gap: 8px;
+}
+
+.bar {
+    flex: 1;
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    border-radius: 4px 4px 0 0;
+    position: relative;
+    transition: all 0.3s ease;
+    animation: growUp 1s ease-out;
+}
+
+.bar:hover {
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+    transform: translateY(-5px);
+}
+
+.bar::after {
+    content: attr(data-value);
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #e2e8f0;
+    font-size: 12px;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.bar:hover::after {
+    opacity: 1;
+}
+
+@keyframes growUp {
+    from {
+        height: 0;
+    }
+    to {
+        height: var(--height);
+    }
+}
+
+.bar-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.bar-labels span {
+    flex: 1;
+    text-align: center;
+}
+
+/* Trend indicators */
+.trend-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    margin-top: 8px;
+    justify-content: center;
+}
+
+.trend-up {
+    color: #22c55e;
+}
+
+.trend-down {
+    color: #ef4444;
+}
+
+.trend-arrow {
+    font-size: 10px;
+}
+
+@keyframes drawLine {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
     </style>
 </head>
 <body>
@@ -364,16 +485,97 @@ $cartItems = rand(50, 150);
         </div>
 
         <div class="charts-section">
-            <div class="chart-card">
-                <h3>User Registration Trends</h3>
-                <canvas id="userChart" width="400" height="200"></canvas>
-            </div>
-            
-            <div class="chart-card">
-                <h3>Sales Overview</h3>
-                <canvas id="salesChart" width="400" height="200"></canvas>
-            </div>
+    <!-- User Registration Trends -->
+    <div class="chart-card">
+        <h3>User Registration Trends</h3>
+        <div class="line-chart">
+            <svg viewBox="0 0 350 200">
+                <!-- Grid lines -->
+                <defs>
+                    <pattern id="grid" width="50" height="40" patternUnits="userSpaceOnUse">
+                        <path d="M 50 0 L 0 0 0 40" fill="none" stroke="rgba(100, 116, 139, 0.2)" stroke-width="1"/>
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#grid)"/>
+                
+                <!-- Line chart -->
+                <polyline 
+                    fill="none" 
+                    stroke="#3b82f6" 
+                    stroke-width="3"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    points="25,160 75,140 125,120 175,100 225,80 275,60 325,40"
+                    style="stroke-dasharray: 400; stroke-dashoffset: 400; animation: drawLine 2s ease-in-out forwards;"
+                />
+                
+                <!-- Data points -->
+                <circle cx="25" cy="160" r="4" fill="#3b82f6" opacity="0" style="animation: fadeIn 0.5s ease-in-out 2s forwards;"/>
+                <circle cx="75" cy="140" r="4" fill="#3b82f6" opacity="0" style="animation: fadeIn 0.5s ease-in-out 2.2s forwards;"/>
+                <circle cx="125" cy="120" r="4" fill="#3b82f6" opacity="0" style="animation: fadeIn 0.5s ease-in-out 2.4s forwards;"/>
+                <circle cx="175" cy="100" r="4" fill="#3b82f6" opacity="0" style="animation: fadeIn 0.5s ease-in-out 2.6s forwards;"/>
+                <circle cx="225" cy="80" r="4" fill="#3b82f6" opacity="0" style="animation: fadeIn 0.5s ease-in-out 2.8s forwards;"/>
+                <circle cx="275" cy="60" r="4" fill="#3b82f6" opacity="0" style="animation: fadeIn 0.5s ease-in-out 3s forwards;"/>
+                <circle cx="325" cy="40" r="4" fill="#3b82f6" opacity="0" style="animation: fadeIn 0.5s ease-in-out 3.2s forwards;"/>
+                
+                <!-- Area under line -->
+                <polygon 
+                    fill="url(#gradient)" 
+                    points="25,160 75,140 125,120 175,100 225,80 275,60 325,40 325,200 25,200"
+                    opacity="0"
+                    style="animation: fadeIn 1s ease-in-out 2s forwards;"
+                />
+                
+                <defs>
+                    <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:rgba(59, 130, 246, 0.3);stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:rgba(59, 130, 246, 0);stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+            </svg>
         </div>
+        <div class="chart-labels">
+            <span>Jan</span>
+            <span>Feb</span>
+            <span>Mar</span>
+            <span>Apr</span>
+            <span>May</span>
+            <span>Jun</span>
+            <span>Jul</span>
+        </div>
+        <div class="trend-indicator trend-up">
+            <span class="trend-arrow">↗</span>
+            <span>+24% from last month</span>
+        </div>
+    </div>
+
+    <!-- Sales Overview -->
+    <div class="chart-card">
+        <h3>Sales Overview</h3>
+        <div class="bar-chart">
+            <div class="bar" style="--height: 60px; height: 60px;" data-value="<?php echo max(1, $gamesSoldToday - 6); ?>"></div>
+            <div class="bar" style="--height: 80px; height: 80px;" data-value="<?php echo max(1, $gamesSoldToday + 2); ?>"></div>
+            <div class="bar" style="--height: 45px; height: 45px;" data-value="<?php echo max(1, $gamesSoldToday - 8); ?>"></div>
+            <div class="bar" style="--height: 120px; height: 120px;" data-value="<?php echo max(1, $gamesSoldToday + 8); ?>"></div>
+            <div class="bar" style="--height: 90px; height: 90px;" data-value="<?php echo max(1, $gamesSoldToday + 1); ?>"></div>
+            <div class="bar" style="--height: 150px; height: 150px;" data-value="<?php echo max(1, $gamesSoldToday + 12); ?>"></div>
+            <div class="bar" style="--height: 110px; height: 110px;" data-value="<?php echo $gamesSoldToday; ?>"></div>
+        </div>
+        <div class="bar-labels">
+            <span>Mon</span>
+            <span>Tue</span>
+            <span>Wed</span>
+            <span>Thu</span>
+            <span>Fri</span>
+            <span>Sat</span>
+            <span>Sun</span>
+        </div>
+        <div class="trend-indicator trend-up">
+            <span class="trend-arrow">↗</span>
+            <span>+12% from last week</span>
+        </div>
+    </div>
+</div>
 
         <div class="tables-section">
             <div class="table-section">
@@ -425,7 +627,7 @@ $cartItems = rand(50, 150);
                             <tr>
                                 <td><?php echo htmlspecialchars($sale['name']); ?></td>
                                 <td><?php echo htmlspecialchars($sale['username']); ?></td>
-                                <td class="price">$<?php echo number_format($sale['price'], 2); ?></td>
+                                <td class="price">$<?php echo number_format((float)str_replace(['$', ','], '', $sale['price']), 2); ?></td>
                                 <td><?php echo date('M d', strtotime($sale['purchased_at'])); ?></td>
                             </tr>
                             <?php endforeach; ?>
@@ -436,111 +638,6 @@ $cartItems = rand(50, 150);
         </div>
     </main>
 
-    <script>
-        // User Registration Chart
-        const userCtx = document.getElementById('userChart').getContext('2d');
-        new Chart(userCtx, {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
-                datasets: [{
-                    label: 'New Users',
-                    data: [
-                        Math.max(0, <?php echo $userCount; ?> - rand(200, 400)), 
-                        Math.max(0, <?php echo $userCount; ?> - rand(150, 300)), 
-                        Math.max(0, <?php echo $userCount; ?> - rand(100, 200)), 
-                        Math.max(0, <?php echo $userCount; ?> - rand(80, 150)), 
-                        Math.max(0, <?php echo $userCount; ?> - rand(50, 100)), 
-                        Math.max(0, <?php echo $userCount; ?> - rand(20, 50)), 
-                        <?php echo $userCount; ?>
-                    ],
-                    borderColor: '#3b82f6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: '#e2e8f0'
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        ticks: {
-                            color: '#94a3b8'
-                        },
-                        grid: {
-                            color: '#334155'
-                        }
-                    },
-                    x: {
-                        ticks: {
-                            color: '#94a3b8'
-                        },
-                        grid: {
-                            color: '#334155'
-                        }
-                    }
-                }
-            }
-        });
-
-        // Sales Chart
-        const salesCtx = document.getElementById('salesChart').getContext('2d');
-        new Chart(salesCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                datasets: [{
-                    label: 'Games Sold',
-                    data: [
-                        Math.floor(Math.random() * 20) + 5,
-                        Math.floor(Math.random() * 15) + 8,
-                        Math.floor(Math.random() * 18) + 6,
-                        Math.floor(Math.random() * 22) + 7,
-                        Math.floor(Math.random() * 25) + 10,
-                        Math.floor(Math.random() * 30) + 12,
-                        <?php echo max(1, $gamesSoldToday); ?>
-                    ],
-                    backgroundColor: 'rgba(59, 130, 246, 0.8)',
-                    borderColor: '#3b82f6',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: '#e2e8f0'
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        ticks: {
-                            color: '#94a3b8'
-                        },
-                        grid: {
-                            color: '#334155'
-                        }
-                    },
-                    x: {
-                        ticks: {
-                            color: '#94a3b8'
-                        },
-                        grid: {
-                            color: '#334155'
-                        }
-                    }
-                }
-            }
-        });
-    </script>
+    
 </body>
 </html>

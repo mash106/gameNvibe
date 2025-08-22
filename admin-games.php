@@ -504,7 +504,12 @@ try {
                                     <td style="font-weight: 600; color: #e2e8f0;"><?php echo htmlspecialchars($game['name']); ?></td>
                                     <td><span class="genre-badge"><?php echo ucfirst(htmlspecialchars($game['genre'])); ?></span></td>
                                     <td style="color: #94a3b8;"><?php echo htmlspecialchars($game['developer']); ?></td>
-                                    <td class="price"><?php echo $game['price'] == 0 ? 'Free' : '$' . number_format($game['price'], 2); ?></td>
+                                   <td class="price">
+    <?php 
+    $cleanPrice = (float)str_replace(['$', ','], '', $game['price']);
+    echo $cleanPrice == 0 ? 'Free' : '$' . number_format($cleanPrice, 2); 
+    ?>
+</td>
                                     <td class="rating"><?php echo number_format($game['rating'], 1); ?>/5</td>
                                     <td class="description" title="<?php echo htmlspecialchars($game['description']); ?>"><?php echo htmlspecialchars($game['description']); ?></td>
                                     <td style="color: #64748b; font-size: 12px;"><?php echo date('M d, Y', strtotime($game['created_at'])); ?></td>

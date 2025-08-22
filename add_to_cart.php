@@ -2,7 +2,7 @@
 session_start();
 require_once 'db.php';
 
-// Check if user is logged in
+
 if (!isset($_SESSION['user_id'])) {
     echo json_encode(['success' => false, 'message' => 'Please login first']);
     exit();
@@ -23,13 +23,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     try {
-        // First, check if game exists in games table
+       
         $stmt = $pdo->prepare("SELECT id FROM games WHERE name = ?");
         $stmt->execute([$game_name]);
         $game = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$game) {
-            // Insert new game if it doesn't exist
+         
             $stmt = $pdo->prepare("
                 INSERT INTO games (name, price, genre, rating, developer, description, created_at) 
                 VALUES (?, ?, ?, ?, ?, ?, NOW())
@@ -40,7 +40,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $game_id = $game['id'];
         }
 
-        // Check if already in cart
         $stmt = $pdo->prepare("SELECT id FROM cart WHERE user_id = ? AND game_id = ?");
         $stmt->execute([$user_id, $game_id]);
         
@@ -49,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
 
-        // Add to cart
+
         $stmt = $pdo->prepare("INSERT INTO cart (user_id, game_id, added_at) VALUES (?, ?, NOW())");
         $stmt->execute([$user_id, $game_id]);
 
