@@ -403,7 +403,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
     <header class="header">
         <a href="<?php echo $isLoggedIn ? 'dashboard.php' : 'loginpage.html'; ?>" class="logo">gameNvibe</a>
         <nav class="nav-menu">
-            <a href="news.php" class="nav-btn">🔰 News</a>
+            <a href="news.php" class="nav-btn">📰 News</a>
             <a href="games.php" class="nav-btn active">🎮 Games</a>
             <a href="reviews.php" class="nav-btn">⭐ Reviews</a>
             <a href="forums.php" class="nav-btn">💬 Forums</a>

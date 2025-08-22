@@ -50,26 +50,8 @@
             margin-top: 5px;
         }
 
-        .info-section {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .info-section h2 {
-            color: #e2e8f0;
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        .info-section p {
-            color: #94a3b8;
-            font-size: 15px;
-            line-height: 1.5;
-        }
-
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .form-group label {
@@ -115,7 +97,6 @@
             transition: all 0.3s ease;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 20px;
         }
 
         .btn-primary:hover {
@@ -124,118 +105,21 @@
             box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
         }
 
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-
-        .btn-primary:disabled {
-            background: #475569;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .success-message {
-            background: rgba(34, 197, 94, 0.1);
-            border: 1px solid rgba(34, 197, 94, 0.3);
-            border-radius: 10px;
-            padding: 16px;
-            margin-bottom: 25px;
-            display: none;
-        }
-
-        .success-message p {
-            color: #22c55e;
-            font-size: 14px;
-            text-align: center;
-            margin: 0;
-        }
-
-        .back-to-login {
+        .back-link {
             text-align: center;
             margin-top: 25px;
-        }
-
-        .back-to-login a {
-            color: #3b82f6;
-            text-decoration: none;
+            color: #cbd5e1;
             font-size: 14px;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
         }
 
-        .back-to-login a:hover {
-            text-decoration: underline;
-        }
-
-        .help-section {
-            background: rgba(30, 41, 59, 0.5);
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 30px;
-            border: 1px solid #334155;
-        }
-
-        .help-section h3 {
-            color: #e2e8f0;
-            font-size: 16px;
-            margin-bottom: 10px;
-        }
-
-        .help-section p {
-            color: #94a3b8;
-            font-size: 13px;
-            line-height: 1.5;
-            margin-bottom: 10px;
-        }
-
-        .help-section a {
+        .back-link a {
             color: #3b82f6;
             text-decoration: none;
+            font-weight: 500;
         }
 
-        .help-section a:hover {
+        .back-link a:hover {
             text-decoration: underline;
-        }
-
-        .timer {
-            text-align: center;
-            margin-top: 15px;
-            color: #64748b;
-            font-size: 13px;
-            display: none;
-        }
-
-        .loading {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: #3b82f6;
-            animation: spin 0.8s ease-in-out infinite;
-            margin-right: 8px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        @media (max-width: 480px) {
-            .auth-container {
-                padding: 30px 25px;
-                margin: 10px;
-            }
-
-            .info-section h2 {
-                font-size: 20px;
-            }
-
-            .info-section p {
-                font-size: 14px;
-            }
         }
     </style>
 </head>
@@ -246,123 +130,32 @@
             <p>Reset your password</p>
         </div>
 
-        <div class="info-section">
-            <h2>Forgot Password?</h2>
-            <p>No worries! Enter your email address and we'll send you a reset link to get you back in the game.</p>
-        </div>
-
-        <form id="forgotPasswordForm">
-            <div class="success-message" id="successMessage">
-                <p>Password reset link has been sent to your email! Check your inbox and spam folder.</p>
-            </div>
-
+        <form>
             <div class="form-group">
                 <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" placeholder="Enter your registered email" required>
+                <input type="email" id="email" name="email" placeholder="Enter your email address" required>
             </div>
 
-            <button type="submit" class="btn-primary" id="submitBtn">
-                Send Reset Link
-            </button>
-
-            <div class="timer" id="timer">
-                You can request another reset in <span id="countdown">60</span> seconds
-            </div>
+            <button type="submit" class="btn-primary">Reset Password</button>
         </form>
 
-        <div class="back-to-login">
-            <a href="loginpage.html">← Back to Login</a>
-        </div>
-
-        <div class="help-section">
-            <h3>Need Help?</h3>
-            <p>If you don't receive the email within a few minutes, check your spam folder or try again.</p>
-            <p>Still having trouble? Contact our <a href="#">support team</a> for assistance.</p>
-            <p><strong>Note:</strong> Reset links expire after 24 hours for security reasons.</p>
+        <div class="back-link">
+            Remember your password? <a href="loginpage.html">Back to Login</a>
         </div>
     </div>
 
     <script>
-        let countdownTimer;
-        let timeLeft = 0;
-
-        document.getElementById('forgotPasswordForm').addEventListener('submit', function(e) {
+        document.querySelector('form').addEventListener('submit', function(e) {
             e.preventDefault();
-            
             const email = document.getElementById('email').value.trim();
-            const submitBtn = document.getElementById('submitBtn');
-            const successMessage = document.getElementById('successMessage');
-            const timerElement = document.getElementById('timer');
             
             if (!email) {
                 alert('Please enter your email address.');
                 return;
             }
             
-            // Email validation
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                alert('Please enter a valid email address.');
-                return;
-            }
-            
-            // Show loading state
-            submitBtn.innerHTML = '<span class="loading"></span>Sending...';
-            submitBtn.disabled = true;
-            
-            // Simulate API call
-            setTimeout(() => {
-                // Show success message
-                successMessage.style.display = 'block';
-                
-                // Reset button and start countdown
-                submitBtn.innerHTML = 'Resend Reset Link';
-                startCountdown();
-                
-                // Scroll to success message
-                successMessage.scrollIntoView({ behavior: 'smooth' });
-            }, 2000);
-        });
-        
-        function startCountdown() {
-            const submitBtn = document.getElementById('submitBtn');
-            const timerElement = document.getElementById('timer');
-            const countdownSpan = document.getElementById('countdown');
-            
-            timeLeft = 60;
-            submitBtn.disabled = true;
-            timerElement.style.display = 'block';
-            
-            countdownTimer = setInterval(() => {
-                timeLeft--;
-                countdownSpan.textContent = timeLeft;
-                
-                if (timeLeft <= 0) {
-                    clearInterval(countdownTimer);
-                    submitBtn.disabled = false;
-                    timerElement.style.display = 'none';
-                    submitBtn.innerHTML = 'Send Reset Link';
-                }
-            }, 1000);
-        }
-        
-        // Check for demo email
-        document.getElementById('email').addEventListener('blur', function() {
-            const email = this.value.trim().toLowerCase();
-            if (email === 'demo@gamenvibe.com') {
-                this.style.borderColor = '#22c55e';
-                setTimeout(() => {
-                    this.style.borderColor = '#334155';
-                }, 2000);
-            }
-        });
-        
-        // Clear success message when typing
-        document.getElementById('email').addEventListener('input', function() {
-            const successMessage = document.getElementById('successMessage');
-            if (successMessage.style.display === 'block') {
-                successMessage.style.display = 'none';
-            }
+            alert('Password reset link has been sent to your email!');
+            window.location.href = 'loginpage.html';
         });
     </script>
 </body>

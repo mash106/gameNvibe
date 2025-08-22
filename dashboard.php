@@ -2,10 +2,10 @@
 session_start();
 
 // Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
-    header("Location: loginpage.html");
-    exit();
-}
+//if (!isset($_SESSION['user_id'])) {
+  //  header("Location: loginpage.html");
+    //exit();
+//}
 ?>
 
 <!DOCTYPE html>
@@ -222,15 +222,24 @@ if (!isset($_SESSION['user_id'])) {
             <a href="profile.php" class="nav-btn">👤 Profile</a>
         </nav>
         <div class="user-info">
-            <span>Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</span>
-            <a href="logout.php" class="logout-btn">Logout</a>
+        <?php if (isset($_SESSION['username'])): ?>
+    <span>Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>!</span>
+    <a href="logout.php" class="logout-btn">Logout</a>
+<?php else: ?>
+    <span>Browsing as Guest</span>
+    <a href="loginpage.html" class="logout-btn">Login</a>
+<?php endif; ?>
         </div>
     </header>
 
     <main class="main-content">
         <div class="welcome-card">
             <h1>🎮 Welcome to gameNvibe!</h1>
-            <p>You're successfully logged in as <strong><?php echo htmlspecialchars($_SESSION['username']); ?></strong></p>
+            <?php if (isset($_SESSION['username'])): ?>
+    <p>You're successfully logged in as <strong><?php echo htmlspecialchars($_SESSION['username']); ?></strong></p>
+<?php else: ?>
+    <p>Welcome to gameNvibe! Browse as a guest or <a href="loginpage.html" style="color: #3b82f6;">login</a> for full access.</p>
+<?php endif; ?>
         </div>
 
         <div class="quick-actions">
@@ -262,8 +271,13 @@ if (!isset($_SESSION['user_id'])) {
         <div class="stats-grid">
             <div class="stat-card">
                 <h3>🎯 Your Profile</h3>
-                <p>Username: <?php echo htmlspecialchars($_SESSION['username']); ?><br>
-                   Email: <?php echo htmlspecialchars($_SESSION['email']); ?></p>
+                <?php if (isset($_SESSION['username'])): ?>
+    <p>Username: <?php echo htmlspecialchars($_SESSION['username']); ?><br>
+       Email: <?php echo htmlspecialchars($_SESSION['email']); ?></p>
+<?php else: ?>
+    <p>Guest User<br>
+       <a href="loginpage.html" style="color: #3b82f6;">Login</a> to access profile features</p>
+<?php endif; ?>
             </div>
             
             <div class="stat-card">

@@ -589,41 +589,322 @@ $isLoggedIn = isset($_SESSION['user_id']);
     </main>
 
     <script>
-        // Forum item click handlers
-        document.querySelectorAll('.forum-item').forEach(item => {
-            item.addEventListener('click', function() {
-                <?php if ($isLoggedIn): ?>
-                    console.log('Navigate to forum:', this.querySelector('.forum-title').textContent);
-                    // Here you would navigate to the specific forum
-                <?php else: ?>
-                    alert('Please login to access the forums');
-                    window.location.href = 'loginpage.html';
-                <?php endif; ?>
+       // Forum item click handlers
+document.querySelectorAll('.forum-item').forEach(item => {
+    item.addEventListener('click', function() {
+        <?php if ($isLoggedIn): ?>
+            const forumTitle = this.querySelector('.forum-title').textContent;
+            const forumDesc = this.querySelector('.forum-description').textContent;
+            
+            // Create modal to show forum topics
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.8); display: flex; align-items: center;
+                justify-content: center; z-index: 1000; overflow-y: auto;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: #0f172a; padding: 30px; border-radius: 12px; 
+                           width: 90%; max-width: 700px; border: 1px solid #3b82f6; max-height: 80vh; overflow-y: auto;">
+                    <h3 style="color: #3b82f6; margin-bottom: 10px;">${forumTitle}</h3>
+                    <p style="color: #94a3b8; margin-bottom: 20px;">${forumDesc}</p>
+                    
+                    <div style="border-top: 1px solid #334155; padding-top: 20px;">
+                        <h4 style="color: #e2e8f0; margin-bottom: 15px;">Recent Topics:</h4>
+                        ${getForumTopics(forumTitle)}
+                    </div>
+                    
+                    <button id="closeForum" style="margin-top: 20px; padding: 10px 20px; background: #374151; 
+                            color: #e2e8f0; border: none; border-radius: 6px; cursor: pointer; float: right;">Close</button>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            document.getElementById('closeForum').onclick = () => document.body.removeChild(modal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) document.body.removeChild(modal);
             });
-        });
+        <?php else: ?>
+            alert('Please login to access the forums');
+            window.location.href = 'loginpage.html';
+        <?php endif; ?>
+    });
+});
 
-        // Topic item click handlers
-        document.querySelectorAll('.topic-item').forEach(item => {
-            item.addEventListener('click', function() {
-                <?php if ($isLoggedIn): ?>
-                    console.log('Navigate to topic:', this.querySelector('.topic-title').textContent);
-                    // Here you would navigate to the specific topic
-                <?php else: ?>
-                    alert('Please login to view topics');
-                    window.location.href = 'loginpage.html';
-                <?php endif; ?>
-            });
-        });
+// Topic item click handlers
+document.querySelectorAll('.topic-item').forEach(item => {
+    item.addEventListener('click', function() {
+        <?php if ($isLoggedIn): ?>
+            const topicTitle = this.querySelector('.topic-title').textContent;
+            const topicAuthor = this.querySelector('.topic-author').textContent;
+            const topicDate = this.querySelector('.topic-date').textContent;
+            
+            showTopicDiscussion(topicTitle, topicAuthor, topicDate);
+        <?php else: ?>
+            alert('Please login to view topics');
+            window.location.href = 'loginpage.html';
+        <?php endif; ?>
+    });
+});
 
-        // New topic button handlers
-        document.querySelectorAll('.new-topic-btn').forEach(btn => {
-            if (btn.textContent.includes('New Topic')) {
-                btn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    alert('New Topic feature coming soon!');
+// Helper function to generate forum topics
+function getForumTopics(forumType) {
+    const topics = {
+        'Game Recommendations': [
+            { title: 'Hidden indie gems you must play', author: 'IndieHunter', replies: 12 },
+            { title: 'Best co-op games for couples', author: 'GamerCouple', replies: 8 },
+            { title: 'Racing games with realistic physics', author: 'SpeedDemon', replies: 15 }
+        ],
+        'Gaming News & Updates': [
+            { title: 'E3 2025 predictions and wishlist', author: 'NewsHawk', replies: 23 },
+            { title: 'New console generation rumors', author: 'TechInsider', replies: 31 },
+            { title: 'Gaming industry layoffs discussion', author: 'IndustryWatcher', replies: 18 }
+        ],
+        'Gaming Help & Support': [
+            { title: 'PC crashing during intensive games', author: 'TechTrouble', replies: 6 },
+            { title: 'Best settings for budget GPU?', author: 'BudgetGamer', replies: 9 },
+            { title: 'Controller not working properly', author: 'ControllerIssue', replies: 4 }
+        ],
+        'PC Gaming': [
+            { title: 'RTX 4090 vs RTX 4080 comparison', author: 'GraphicsGuru', replies: 28 },
+            { title: 'Best mechanical keyboard for gaming?', author: 'KeyboardWarrior', replies: 19 },
+            { title: 'Overclocking guide for beginners', author: 'OCExpert', replies: 14 }
+        ],
+        'Console Gaming': [
+            { title: 'PS5 vs Xbox Series X in 2025', author: 'ConsoleDebater', replies: 45 },
+            { title: 'Nintendo Direct predictions', author: 'NintendoFan', replies: 22 },
+            { title: 'Best exclusive games this year', author: 'ExclusiveHunter', replies: 17 }
+        ],
+        'Mobile Gaming': [
+            { title: 'iOS vs Android gaming performance', author: 'MobileGuru', replies: 11 },
+            { title: 'Best mobile games without ads', author: 'AdFreeGamer', replies: 16 },
+            { title: 'Gaming phone recommendations', author: 'PhoneGamer', replies: 13 }
+        ]
+    };
+    
+    const forumTopics = topics[forumType] || topics['Game Recommendations'];
+    
+    return forumTopics.map(topic => `
+        <div style="background: #1e293b; padding: 15px; border-radius: 8px; margin-bottom: 10px; cursor: pointer; border: 1px solid #334155;"
+             onclick="showTopicDiscussion('${topic.title}', '${topic.author}', '2 hours ago')">
+            <div style="color: #e2e8f0; font-weight: 600; margin-bottom: 5px;">${topic.title}</div>
+            <div style="color: #64748b; font-size: 12px;">by ${topic.author} • ${topic.replies} replies</div>
+        </div>
+    `).join('');
+}
+
+// Function to show topic discussion
+function showTopicDiscussion(title, author, date) {
+    const discussions = [
+        { user: author, time: date, message: getOriginalPost(title) },
+        { user: 'GameExplorer', time: '1 hour ago', message: 'Great topic! I totally agree with your points. Have you tried the games I mentioned in my review?' },
+        { user: 'RetroGamer90', time: '45 min ago', message: 'This reminds me of classic games from the 90s. The mechanics you described are very similar to what we had back then.' },
+        { user: 'ProGamer2025', time: '30 min ago', message: '@GameExplorer Which games are you referring to? I\'d love to check them out!' },
+        { user: 'CasualPlayer', time: '15 min ago', message: 'As someone new to gaming, this is really helpful. Thanks for the detailed explanation!' }
+    ];
+    
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.8); display: flex; align-items: center;
+        justify-content: center; z-index: 1000; overflow-y: auto;
+    `;
+    
+    modal.innerHTML = `
+        <div style="background: #0f172a; padding: 30px; border-radius: 12px; 
+                   width: 90%; max-width: 800px; border: 1px solid #3b82f6; max-height: 80vh; overflow-y: auto;">
+            <h3 style="color: #3b82f6; margin-bottom: 20px;">${title}</h3>
+            
+            <div style="max-height: 400px; overflow-y: auto; border: 1px solid #334155; border-radius: 8px; padding: 15px; background: #1e293b;">
+                ${discussions.map(msg => `
+                    <div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #334155;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span style="color: #3b82f6; font-weight: 600;">${msg.user}</span>
+                            <span style="color: #64748b; font-size: 12px;">${msg.time}</span>
+                        </div>
+                        <div style="color: #e2e8f0; line-height: 1.5;">${msg.message}</div>
+                    </div>
+                `).join('')}
+            </div>
+            
+            <div style="margin-top: 20px; display: flex; gap: 10px;">
+                <input type="text" placeholder="Type your reply..." 
+                       style="flex: 1; padding: 10px; background: #1e293b; border: 1px solid #334155; 
+                              border-radius: 6px; color: #e2e8f0;">
+                <button style="padding: 10px 20px; background: linear-gradient(135deg, #3b82f6, #2563eb); 
+                               color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Reply</button>
+            </div>
+            
+            <button id="closeTopic" style="margin-top: 15px; padding: 10px 20px; background: #374151; 
+                    color: #e2e8f0; border: none; border-radius: 6px; cursor: pointer; float: right;">Close</button>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    document.getElementById('closeTopic').onclick = () => document.body.removeChild(modal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) document.body.removeChild(modal);
+    });
+}
+
+// Function to generate original post content
+function getOriginalPost(title) {
+    const posts = {
+        'Best RPGs of 2025 - What are your favorites?': 'Hey everyone! I\'ve been diving deep into RPGs this year and wanted to share some amazing discoveries. The storytelling and character development in recent releases have been absolutely incredible. What are your top picks for 2025?',
+        'Graphics card recommendations for 4K gaming?': 'I\'m planning to upgrade my setup for 4K gaming. My current GPU is struggling with newer titles at max settings. What would you recommend for a smooth 4K experience at 60+ FPS? Budget is around $800-1200.',
+        'New console exclusive announced - Thoughts?': 'Just saw the announcement trailer and I\'m hyped! The graphics look incredible and the gameplay mechanics seem innovative. However, I\'m concerned about the exclusivity aspect. What are your thoughts on this trend?',
+        'Looking for co-op games to play with friends': 'My friend group is looking for new co-op games to play during our weekend sessions. We enjoy both competitive and collaborative gameplay. Any suggestions for 4-6 players? We\'ve already played most of the popular titles.'
+    };
+    
+    return posts[title] || 'This is an interesting topic that deserves discussion. What are your thoughts on this subject? I\'d love to hear different perspectives from the community!';
+}
+// New topic button handlers
+document.querySelectorAll('.new-topic-btn').forEach(btn => {
+    if (btn.textContent.includes('New Topic')) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Get the category from the closest section
+            const categorySection = this.closest('.category-section');
+            const categoryTitle = categorySection.querySelector('.category-title').textContent;
+            
+            // Create modal-style form
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.8); display: flex; align-items: center;
+                justify-content: center; z-index: 1000;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: #0f172a; padding: 30px; border-radius: 12px; 
+                           width: 90%; max-width: 500px; border: 1px solid #3b82f6;">
+                    <h3 style="color: #3b82f6; margin-bottom: 20px;">Create New Topic in ${categoryTitle}</h3>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <label style="color: #e2e8f0; display: block; margin-bottom: 5px;">Topic Title:</label>
+                        <input type="text" id="topicTitle" placeholder="Enter an engaging title..." 
+                               style="width: 100%; padding: 10px; background: #1e293b; border: 1px solid #334155; 
+                                      border-radius: 6px; color: #e2e8f0; font-size: 14px;">
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label style="color: #e2e8f0; display: block; margin-bottom: 5px;">Your Message:</label>
+                        <textarea id="topicContent" placeholder="Share your thoughts, ask questions, or start a discussion..." 
+                                style="width: 100%; height: 120px; padding: 10px; background: #1e293b; 
+                                       border: 1px solid #334155; border-radius: 6px; color: #e2e8f0; 
+                                       font-size: 14px; resize: vertical; font-family: inherit;"></textarea>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                        <button id="cancelTopic" style="padding: 10px 20px; background: #374151; color: #e2e8f0; 
+                                border: none; border-radius: 6px; cursor: pointer;">Cancel</button>
+                        <button id="createTopic" style="padding: 10px 20px; background: linear-gradient(135deg, #3b82f6, #2563eb); 
+                                color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">Create Topic</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            document.getElementById('topicTitle').focus();
+            
+            // Handle cancel
+            document.getElementById('cancelTopic').onclick = () => {
+                document.body.removeChild(modal);
+            };
+            
+            // Handle create
+            document.getElementById('createTopic').onclick = () => {
+                const title = document.getElementById('topicTitle').value.trim();
+                const content = document.getElementById('topicContent').value.trim();
+                
+                if (!title) {
+                    alert('Please enter a topic title!');
+                    return;
+                }
+                
+                if (!content) {
+                    alert('Please enter your message!');
+                    return;
+                }
+                
+                // Create new topic element
+                const newTopic = document.createElement('div');
+                newTopic.className = 'topic-item';
+                newTopic.innerHTML = `
+                    <div class="topic-header">
+                        <div class="topic-info">
+                            <div class="topic-title">${title}</div>
+                            <div class="topic-meta">
+                                <span class="topic-author"><?php echo isset($_SESSION['username']) ? $_SESSION['username'] : 'Guest_User'; ?></span>
+                                <span class="topic-date">Just now</span>
+                                <span class="topic-category">${categoryTitle.replace('🎮 ', '').replace('🎯 ', '')}</span>
+                            </div>
+                        </div>
+                        <div class="topic-stats">
+                            <div class="topic-stat">
+                                <div class="topic-stat-value">0</div>
+                                <div class="topic-stat-label">Replies</div>
+                            </div>
+                            <div class="topic-stat">
+                                <div class="topic-stat-value">1</div>
+                                <div class="topic-stat-label">Views</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Add click handler to new topic
+                newTopic.addEventListener('click', function() {
+                    alert(`Topic: "${title}"\n\nContent: "${content}"\n\nClick OK to view full discussion!`);
                 });
-            }
+                
+                // Add to recent topics section
+                const recentTopics = document.querySelector('.recent-topics');
+                const firstTopic = recentTopics.querySelector('.topic-item');
+                if (firstTopic) {
+                    recentTopics.insertBefore(newTopic, firstTopic);
+                } else {
+                    recentTopics.appendChild(newTopic);
+                }
+                
+                // Success feedback
+                document.body.removeChild(modal);
+                
+                // Smooth scroll to the new topic
+                newTopic.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Highlight the new topic briefly
+                newTopic.style.background = 'rgba(59, 130, 246, 0.2)';
+                setTimeout(() => {
+                    newTopic.style.background = '';
+                }, 2000);
+                
+                // Show success message
+                const successMsg = document.createElement('div');
+                successMsg.style.cssText = `
+                    position: fixed; top: 20px; right: 20px; background: linear-gradient(135deg, #10b981, #059669);
+                    color: white; padding: 15px 20px; border-radius: 8px; z-index: 1001;
+                    font-weight: 600; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+                `;
+                successMsg.textContent = '🎉 Topic created successfully!';
+                document.body.appendChild(successMsg);
+                
+                setTimeout(() => {
+                    document.body.removeChild(successMsg);
+                }, 3000);
+            };
+            
+            // Close modal when clicking outside
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    document.body.removeChild(modal);
+                }
+            });
         });
+    }
+});
     </script>
 </body>
 </html>
