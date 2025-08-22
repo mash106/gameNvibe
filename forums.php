@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Check if user is logged in (required for forums)
+
 $isLoggedIn = isset($_SESSION['user_id']);
 ?>
 
@@ -748,7 +748,7 @@ function showTopicDiscussion(title, author, date) {
     });
 }
 
-// Function to generate original post content
+
 function getOriginalPost(title) {
     const posts = {
         'Best RPGs of 2025 - What are your favorites?': 'Hey everyone! I\'ve been diving deep into RPGs this year and wanted to share some amazing discoveries. The storytelling and character development in recent releases have been absolutely incredible. What are your top picks for 2025?',
@@ -758,18 +758,18 @@ function getOriginalPost(title) {
     };
     
     return posts[title] || 'This is an interesting topic that deserves discussion. What are your thoughts on this subject? I\'d love to hear different perspectives from the community!';
-}
-// New topic button handlers
+
+
 document.querySelectorAll('.new-topic-btn').forEach(btn => {
     if (btn.textContent.includes('New Topic')) {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
             
-            // Get the category from the closest section
+           
             const categorySection = this.closest('.category-section');
             const categoryTitle = categorySection.querySelector('.category-title').textContent;
             
-            // Create modal-style form
+            
             const modal = document.createElement('div');
             modal.style.cssText = `
                 position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -809,12 +809,12 @@ document.querySelectorAll('.new-topic-btn').forEach(btn => {
             document.body.appendChild(modal);
             document.getElementById('topicTitle').focus();
             
-            // Handle cancel
+            
             document.getElementById('cancelTopic').onclick = () => {
                 document.body.removeChild(modal);
             };
             
-            // Handle create
+          
             document.getElementById('createTopic').onclick = () => {
                 const title = document.getElementById('topicTitle').value.trim();
                 const content = document.getElementById('topicContent').value.trim();

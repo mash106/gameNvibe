@@ -2,7 +2,7 @@
 session_start();
 require_once 'db.php';
 
-// Check if user is admin
+
 if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
     header("Location: loginpage.html");
     exit();
@@ -11,7 +11,7 @@ if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
 $message = '';
 $messageType = '';
 
-// Handle form submission
+
 if ($_POST) {
     $name = trim($_POST['name']);
     $price = floatval($_POST['price']);
@@ -20,7 +20,7 @@ if ($_POST) {
     $developer = trim($_POST['developer']);
     $description = trim($_POST['description']);
     
-    // Basic validation
+    
     if (empty($name) || empty($genre) || empty($developer) || empty($description)) {
         $message = "Please fill in all required fields!";
         $messageType = "error";
@@ -32,21 +32,21 @@ if ($_POST) {
         $messageType = "error";
     } else {
         try {
-            // Check if game already exists
+        
             $stmt = $pdo->prepare("SELECT id FROM games WHERE name = ?");
             $stmt->execute([$name]);
             if ($stmt->fetch()) {
                 $message = "A game with this name already exists!";
                 $messageType = "error";
             } else {
-                // Insert new game
+                
                 $stmt = $pdo->prepare("INSERT INTO games (name, price, genre, rating, developer, description) VALUES (?, ?, ?, ?, ?, ?)");
                 $stmt->execute([$name, $price, $genre, $rating, $developer, $description]);
                 
                 $message = "Game added successfully!";
                 $messageType = "success";
                 
-                // Clear form data
+                
                 $_POST = array();
             }
         } catch(PDOException $e) {
@@ -56,7 +56,7 @@ if ($_POST) {
     }
 }
 
-// Get existing games for display
+
 try {
     $games = $pdo->query("SELECT * FROM games ORDER BY created_at DESC")->fetchAll(PDO::FETCH_ASSOC);
 } catch(PDOException $e) {

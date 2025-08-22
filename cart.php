@@ -2,7 +2,7 @@
 session_start();
 require_once 'db.php';
 
-// Check if user is logged in
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: loginpage.html");
     exit();
@@ -10,7 +10,7 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// Handle remove from cart
+
 if (isset($_POST['remove_from_cart'])) {
     $game_id = $_POST['game_id'];
     $stmt = $pdo->prepare("DELETE FROM cart WHERE user_id = ? AND game_id = ?");
@@ -19,25 +19,24 @@ if (isset($_POST['remove_from_cart'])) {
     exit();
 }
 
-// Handle purchase (move to owned games)
-// Replace the existing purchase handling section with:
+
 if (isset($_POST['purchase'])) {
     try {
         $pdo->beginTransaction();
         
-        // Get cart items
+      
         $stmt = $pdo->prepare("SELECT game_id FROM cart WHERE user_id = ?");
         $stmt->execute([$user_id]);
         $cart_items = $stmt->fetchAll(PDO::FETCH_COLUMN);
         
         if (!empty($cart_items)) {
-            // Add to owned games
+           
             foreach ($cart_items as $game_id) {
                 $stmt = $pdo->prepare("INSERT IGNORE INTO owned_games (user_id, game_id) VALUES (?, ?)");
                 $stmt->execute([$user_id, $game_id]);
             }
             
-            // Clear the cart
+           
             $stmt = $pdo->prepare("DELETE FROM cart WHERE user_id = ?");
             $stmt->execute([$user_id]);
             
@@ -53,7 +52,7 @@ if (isset($_POST['purchase'])) {
     }
 }
 
-// Get cart items with game details
+
 $stmt = $pdo->prepare("
     SELECT c.id as cart_id, g.* 
     FROM cart c 
@@ -460,7 +459,7 @@ foreach ($cart_items as $item) {
     </main>
 
     <script>
-        // Add confirmation for remove buttons
+       
         document.querySelectorAll('button[name="remove_from_cart"]').forEach(btn => {
             btn.addEventListener('click', function(e) {
                 if (!confirm('Are you sure you want to remove this game from your cart?')) {
@@ -469,7 +468,7 @@ foreach ($cart_items as $item) {
             });
         });
 
-        // Add confirmation for purchase
+    
         document.querySelector('button[name="purchase"]').addEventListener('click', function(e) {
             if (!confirm('Are you sure you want to complete this purchase?')) {
                 e.preventDefault();

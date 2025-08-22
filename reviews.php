@@ -2,10 +2,10 @@
 session_start();
 require_once 'db.php';
 
-// Check if user is logged in
+
 $isLoggedIn = isset($_SESSION['user_id']);
 
-// Handle review submission
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review']) && $isLoggedIn) {
     $user_id = $_SESSION['user_id'];
     $game_id = $_POST['game_id'];
@@ -14,14 +14,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review']) && $
     $review_content = $_POST['review_content'];
     
     try {
-        // Check if user already reviewed this game
+    
         $stmt = $pdo->prepare("SELECT id FROM reviews WHERE user_id = ? AND game_id = ?");
         $stmt->execute([$user_id, $game_id]);
         
         if ($stmt->fetch()) {
             $error_message = "You have already reviewed this game!";
         } else {
-            // Insert new review
+           
             $stmt = $pdo->prepare("
                 INSERT INTO reviews (user_id, game_id, rating, title, content, created_at) 
                 VALUES (?, ?, ?, ?, ?, NOW())
@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review']) && $
     }
 }
 
-// Create reviews table if it doesn't exist
+
 try {
     $pdo->exec("CREATE TABLE IF NOT EXISTS reviews (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -51,13 +51,13 @@ try {
         UNIQUE KEY unique_user_game_review (user_id, game_id)
     )");
 } catch (PDOException $e) {
-    // Table might already exist
+    
 }
 
-// Get filter parameter
+
 $filter = $_GET['filter'] ?? 'all';
 
-// Build query based on filter
+
 $where_clause = "";
 $params = [];
 
@@ -66,7 +66,7 @@ if ($filter !== 'all' && $filter !== 'recent' && $filter !== 'highest_rated') {
     $params[] = "%$filter%";
 }
 
-// Get reviews with game and user information
+
 $order_clause = "ORDER BY r.created_at DESC";
 if ($filter === 'highest_rated') {
     $order_clause = "ORDER BY r.rating DESC, r.created_at DESC";
@@ -83,12 +83,12 @@ $stmt = $pdo->prepare("
 $stmt->execute($params);
 $reviews = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Get all games for the review form
+
 $stmt = $pdo->prepare("SELECT id, name, genre FROM games ORDER BY name");
 $stmt->execute();
 $games = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Get cart count if logged in
+
 $cart_count = 0;
 if ($isLoggedIn) {
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM cart WHERE user_id = ?");
@@ -96,7 +96,7 @@ if ($isLoggedIn) {
     $cart_count = $stmt->fetchColumn();
 }
 
-// Function to generate star display
+
 function getStarDisplay($rating) {
     $stars = '';
     for ($i = 1; $i <= 5; $i++) {
@@ -688,7 +688,7 @@ function getStarDisplay($rating) {
     </main>
 
     <script>
-        // Toggle review form
+       
         <?php if ($isLoggedIn): ?>
         document.getElementById('toggleReviewForm').addEventListener('click', function() {
             const form = document.getElementById('reviewForm');
@@ -703,7 +703,7 @@ function getStarDisplay($rating) {
             toggleBtn.textContent = '✏️ Write Review';
         });
 
-        // Star rating functionality
+        
         const stars = document.querySelectorAll('.star');
         const ratingInput = document.getElementById('rating');
         const ratingText = document.getElementById('rating-text');
@@ -714,7 +714,7 @@ function getStarDisplay($rating) {
                 ratingInput.value = rating;
                 ratingText.textContent = `${rating} star${rating > 1 ? 's' : ''}`;
                 
-                // Update star display
+                
                 stars.forEach((s, index) => {
                     if (index < rating) {
                         s.classList.add('active');
@@ -726,12 +726,12 @@ function getStarDisplay($rating) {
         });
         <?php endif; ?>
 
-        // Vote functionality
+        
         document.querySelectorAll('.vote-btn').forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
                 <?php if ($isLoggedIn): ?>
-                    // Toggle vote styling
+                   
                     this.style.color = this.style.color === 'rgb(59, 130, 246)' ? '#64748b' : '#3b82f6';
                     console.log('Vote clicked:', this.dataset.type);
                 <?php else: ?>
@@ -742,4 +742,4 @@ function getStarDisplay($rating) {
         });
     </script>
 </body>
-</html>
+</html

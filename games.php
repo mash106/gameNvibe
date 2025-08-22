@@ -1,7 +1,5 @@
 <?php
 session_start();
-
-// Check if user is logged in (optional for viewing games)
 $isLoggedIn = isset($_SESSION['user_id']);
 ?>
 
@@ -688,24 +686,24 @@ $isLoggedIn = isset($_SESSION['user_id']);
     <div id="notification" class="notification"></div>
 
     <script>
-        // Get all necessary elements
+        
         const gameItems = document.querySelectorAll('.game-item');
         const searchInput = document.getElementById('searchInput');
         const searchBtn = document.getElementById('searchBtn');
         const filterTags = document.querySelectorAll('.filter-tag');
         const gamesGrid = document.getElementById('gamesGrid');
 
-        // Store original games for reset functionality
+       
         let allGames = Array.from(gameItems);
         let currentFilter = 'all';
         let currentSearch = '';
 
-        // Filter functionality
+        
         filterTags.forEach(tag => {
             tag.addEventListener('click', function() {
-                // Remove active class from all tags
+               
                 filterTags.forEach(t => t.classList.remove('active'));
-                // Add active class to clicked tag
+                
                 this.classList.add('active');
                 
                 currentFilter = this.dataset.filter;
@@ -713,20 +711,20 @@ $isLoggedIn = isset($_SESSION['user_id']);
             });
         });
 
-        // Search functionality
+    
         function performSearch() {
             currentSearch = searchInput.value.toLowerCase().trim();
             applyFilters();
         }
 
-        // Combined filter and search function
+
         function applyFilters() {
             let hasVisibleGames = false;
             
             gameItems.forEach(game => {
                 let showGame = true;
                 
-                // Apply genre filter
+            
                 if (currentFilter !== 'all') {
                     const gameGenre = game.dataset.genre.toLowerCase();
                     if (gameGenre !== currentFilter) {
@@ -734,7 +732,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
                     }
                 }
                 
-                // Apply search filter
+            
                 if (currentSearch && showGame) {
                     const gameName = game.dataset.name.toLowerCase();
                     const gameGenre = game.dataset.genre.toLowerCase();
@@ -749,7 +747,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
                     }
                 }
                 
-                // Show/hide game
+            
                 if (showGame) {
                     game.style.display = game.classList.contains('featured-game') ? 'grid' : 'block';
                     hasVisibleGames = true;
@@ -758,7 +756,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
                 }
             });
             
-            // Show "no results" message if no games are visible
+        
             let noResultsMsg = document.querySelector('.no-results');
             if (!hasVisibleGames) {
                 if (!noResultsMsg) {
@@ -772,17 +770,17 @@ $isLoggedIn = isset($_SESSION['user_id']);
             }
         }
 
-        // Search button click
+    
         searchBtn.addEventListener('click', performSearch);
 
-        // Search on Enter key press
+    
         searchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 performSearch();
             }
         });
 
-        // Clear search when empty
+    
         searchInput.addEventListener('input', function() {
             if (this.value === '') {
                 currentSearch = '';
@@ -790,7 +788,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
             }
         });
 
-        // Game details functionality
+    
         document.querySelectorAll('.game-details-btn').forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();

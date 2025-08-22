@@ -205,31 +205,31 @@
     </div>
 
     <script>
-        // Client-side validation (optional)
+    
         document.querySelector('form').addEventListener('submit', function(e) {
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirm-password').value;
             const terms = document.getElementById('terms').checked;
             
             if (password !== confirmPassword) {
-                e.preventDefault(); // Only prevent if there's an error
+                e.preventDefault(); 
                 alert('Passwords do not match!');
                 return;
             }
             
             if (!terms) {
-                e.preventDefault(); // Only prevent if there's an error
+                e.preventDefault(); 
                 alert('Please accept the terms and conditions.');
                 return;
             }
             
             if (password.length < 6) {
-                e.preventDefault(); // Only prevent if there's an error
+                e.preventDefault(); 
                 alert('Password must be at least 6 characters long.');
                 return;
             }
             
-            // If all validation passes, form will submit to register.php
+            
         });
     </script>
 </body>

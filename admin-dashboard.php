@@ -2,39 +2,39 @@
 session_start();
 require_once 'db.php';
 
-// Check if user is admin
+
 if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
     header("Location: loginpage.html");
     exit();
 }
 
-// Get statistics from database
+
 try {
-    // Total users
+   
     $userCount = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
     
-    // Users registered today
+  
     $todayUsers = $pdo->query("SELECT COUNT(*) FROM users WHERE DATE(created_at) = CURDATE()")->fetchColumn();
     
-    // Users registered this week
+   
     $weekUsers = $pdo->query("SELECT COUNT(*) FROM users WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)")->fetchColumn();
     
-    // Total games available
+   
     $totalGames = $pdo->query("SELECT COUNT(*) FROM games")->fetchColumn();
     
-    // Games sold (purchased) today
+    
     $gamesSoldToday = $pdo->query("SELECT COUNT(*) FROM owned_games WHERE DATE(purchased_at) = CURDATE()")->fetchColumn();
     
-    // Games sold this week
+  
     $gamesSoldWeek = $pdo->query("SELECT COUNT(*) FROM owned_games WHERE purchased_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)")->fetchColumn();
     
-    // Total games sold
+   
     $totalGamesSold = $pdo->query("SELECT COUNT(*) FROM owned_games")->fetchColumn();
     
-    // Recent users for table
+   
     $recentUsers = $pdo->query("SELECT username, email, created_at FROM users ORDER BY created_at DESC LIMIT 10")->fetchAll(PDO::FETCH_ASSOC);
     
-    // Recent game sales
+ 
     $recentSales = $pdo->query("
         SELECT g.name, u.username, og.purchased_at, g.price 
         FROM owned_games og 
@@ -43,7 +43,7 @@ try {
         ORDER BY og.purchased_at DESC LIMIT 5
     ")->fetchAll(PDO::FETCH_ASSOC);
     
-    // Calculate total revenue from sales
+    
     $totalRevenue = $pdo->query("
         SELECT SUM(g.price) as total 
         FROM owned_games og 
@@ -65,7 +65,7 @@ try {
     $totalRevenue = 0;
 }
 
-// Mock data for remaining statistics
+
 $activeUsers = rand(800, 1200);
 $cartItems = rand(50, 150);
 ?>

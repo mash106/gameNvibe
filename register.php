@@ -2,7 +2,7 @@
 session_start();
 require_once 'db.php';
 
-// Debug: Check if form was submitted
+
 echo "Form submitted! POST data received.<br>";
 print_r($_POST);
 echo "<br>---<br>";
@@ -13,7 +13,7 @@ if ($_POST) {
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm-password'];
     
-    // Simple validation
+
     if (empty($username) || empty($email) || empty($password)) {
         die("All fields are required!");
     }
@@ -26,7 +26,7 @@ if ($_POST) {
         die("Password must be at least 6 characters!");
     }
     
-    // Check if email or username already exists
+   
     $check_stmt = $pdo->prepare("SELECT id FROM users WHERE email = ? OR username = ?");
     $check_stmt->execute([$email, $username]);
     
@@ -34,7 +34,7 @@ if ($_POST) {
         die("Email or username already exists!");
     }
     
-    // Hash password and insert user
+
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
     
     try {
