@@ -236,21 +236,21 @@
     </div>
 
     <script>
-        // Optional client-side validation
+        
         document.querySelector('form').addEventListener('submit', function(e) {
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             
             if (!email || !password) {
-                e.preventDefault(); // Only prevent if validation fails
+                e.preventDefault(); 
                 alert('Please fill in all fields.');
                 return;
             }
             
-            // If validation passes, form submits to login.php
+           
         });
 
-        // Guest access
+       
         document.querySelector('.btn-guest').addEventListener('click', function(e) {
     e.preventDefault();
     window.location.href = 'dashboard.php';

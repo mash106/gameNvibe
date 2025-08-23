@@ -485,12 +485,12 @@ $cartItems = rand(50, 150);
         </div>
 
         <div class="charts-section">
-    <!-- User Registration Trends -->
+ 
     <div class="chart-card">
         <h3>User Registration Trends</h3>
         <div class="line-chart">
             <svg viewBox="0 0 350 200">
-                <!-- Grid lines -->
+              
                 <defs>
                     <pattern id="grid" width="50" height="40" patternUnits="userSpaceOnUse">
                         <path d="M 50 0 L 0 0 0 40" fill="none" stroke="rgba(100, 116, 139, 0.2)" stroke-width="1"/>
@@ -498,7 +498,7 @@ $cartItems = rand(50, 150);
                 </defs>
                 <rect width="100%" height="100%" fill="url(#grid)"/>
                 
-                <!-- Line chart -->
+             
                 <polyline 
                     fill="none" 
                     stroke="#3b82f6" 
@@ -509,7 +509,7 @@ $cartItems = rand(50, 150);
                     style="stroke-dasharray: 400; stroke-dashoffset: 400; animation: drawLine 2s ease-in-out forwards;"
                 />
                 
-                <!-- Data points -->
+               
                 <circle cx="25" cy="160" r="4" fill="#3b82f6" opacity="0" style="animation: fadeIn 0.5s ease-in-out 2s forwards;"/>
                 <circle cx="75" cy="140" r="4" fill="#3b82f6" opacity="0" style="animation: fadeIn 0.5s ease-in-out 2.2s forwards;"/>
                 <circle cx="125" cy="120" r="4" fill="#3b82f6" opacity="0" style="animation: fadeIn 0.5s ease-in-out 2.4s forwards;"/>
@@ -518,7 +518,7 @@ $cartItems = rand(50, 150);
                 <circle cx="275" cy="60" r="4" fill="#3b82f6" opacity="0" style="animation: fadeIn 0.5s ease-in-out 3s forwards;"/>
                 <circle cx="325" cy="40" r="4" fill="#3b82f6" opacity="0" style="animation: fadeIn 0.5s ease-in-out 3.2s forwards;"/>
                 
-                <!-- Area under line -->
+               
                 <polygon 
                     fill="url(#gradient)" 
                     points="25,160 75,140 125,120 175,100 225,80 275,60 325,40 325,200 25,200"
@@ -549,7 +549,7 @@ $cartItems = rand(50, 150);
         </div>
     </div>
 
-    <!-- Sales Overview -->
+  
     <div class="chart-card">
         <h3>Sales Overview</h3>
         <div class="bar-chart">

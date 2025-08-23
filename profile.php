@@ -2,7 +2,7 @@
 session_start();
 require_once 'db.php';
 
-// Check if user is logged in (required for profile)
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: loginpage.html");
     exit();
@@ -10,7 +10,7 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// Handle profile update
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
     $email = $_POST['email'];
     $bio = $_POST['bio'];
@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
         $stmt = $pdo->prepare("UPDATE users SET email = ?, bio = ? WHERE id = ?");
         $stmt->execute([$email, $bio, $user_id]);
         
-        // Update session email if changed
+   
         $_SESSION['email'] = $email;
         
         $success_message = "Profile updated successfully!";
@@ -28,12 +28,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
     }
 }
 
-// Get user information
+
 $stmt = $pdo->prepare("SELECT username, email, bio, created_at FROM users WHERE id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// Create owned_games table if it doesn't exist
+
 try {
     $pdo->exec("CREATE TABLE IF NOT EXISTS owned_games (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -45,10 +45,10 @@ try {
         UNIQUE KEY unique_ownership (user_id, game_id)
     )");
 } catch (PDOException $e) {
-    // Table might already exist
+   
 }
 
-// Get owned games
+
 $stmt = $pdo->prepare("
     SELECT g.*, og.purchased_at 
     FROM owned_games og 
@@ -59,16 +59,16 @@ $stmt = $pdo->prepare("
 $stmt->execute([$user_id]);
 $owned_games = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Get cart count
+
 $stmt = $pdo->prepare("SELECT COUNT(*) FROM cart WHERE user_id = ?");
 $stmt->execute([$user_id]);
 $cart_count = $stmt->fetchColumn();
 
-// Calculate stats
+
 $games_owned = count($owned_games);
-$reviews_written = 0; // You can implement this later
-$forum_posts = 0; // You can implement this later
-$hours_played = 0; // You can implement this later
+$reviews_written = 0; 
+$forum_posts = 0; 
+$hours_played = 0; 
 
 ?>
 
@@ -635,7 +635,7 @@ $hours_played = 0; // You can implement this later
     </main>
 
     <script>
-        // Edit profile functionality
+     
         document.getElementById('toggleEdit').addEventListener('click', function() {
             const form = document.getElementById('profileForm');
             const inputs = form.querySelectorAll('input, textarea');
@@ -643,9 +643,9 @@ $hours_played = 0; // You can implement this later
             const isEditing = this.textContent === 'Edit';
 
             if (isEditing) {
-                // Enable editing
+             
                 inputs.forEach(input => {
-                    if (input.name !== 'username') { // Username should remain readonly
+                    if (input.name !== 'username') { 
                         input.removeAttribute('readonly');
                         input.style.backgroundColor = '#0f172a';
                     }
@@ -653,22 +653,22 @@ $hours_played = 0; // You can implement this later
                 this.textContent = 'Cancel';
                 saveBtn.style.display = 'block';
             } else {
-                // Cancel editing - reload page to reset values
+            
                 location.reload();
             }
         });
 
-        // Tab functionality (though we only have one tab now)
+      
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', function() {
-                // Remove active class from all tabs and contents
+                
                 document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
                 document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
                 
-                // Add active class to clicked tab
+                
                 this.classList.add('active');
                 
-                // Show corresponding content
+              
                 const tabId = this.getAttribute('data-tab');
                 document.getElementById(tabId).classList.add('active');
             });

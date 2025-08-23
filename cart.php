@@ -63,7 +63,7 @@ $stmt = $pdo->prepare("
 $stmt->execute([$user_id]);
 $cart_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Calculate total
+
 $total = 0;
 foreach ($cart_items as $item) {
     if ($item['price'] !== 'Free to Play') {

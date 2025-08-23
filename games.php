@@ -820,7 +820,6 @@ System Requirements: Check store page for details`;
             });
         });
 
-        // Add to cart functionality
         document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -833,7 +832,6 @@ System Requirements: Check store page for details`;
                 const gameDeveloper = gameCard.dataset.developer;
                 const gameDescription = gameCard.querySelector('.game-description').textContent;
                 
-                // Send AJAX request to add to cart
                 fetch('add_to_cart.php', {
                     method: 'POST',
                     headers: {
@@ -852,7 +850,7 @@ System Requirements: Check store page for details`;
                 .then(data => {
                     showNotification(data.message, data.success ? 'success' : 'error');
                     if (data.success) {
-                        // Update button text temporarily
+                       
                         const originalText = this.textContent;
                         this.textContent = 'Added!';
                         this.disabled = true;
@@ -868,14 +866,14 @@ System Requirements: Check store page for details`;
             });
         });
 
-        // Play Now functionality
+   
         document.querySelectorAll('.play-now-btn').forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
                 const gameCard = this.closest('.game-item');
                 const gameName = gameCard.querySelector('h2, h3').textContent;
                 
-                alert(`🚀 Launching ${gameName}...\n\nRedirecting to game launcher!`);
+                alert(`Launching ${gameName}...\n\nRedirecting to game launcher!`);
             });
         });
 

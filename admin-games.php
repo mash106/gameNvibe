@@ -2,7 +2,6 @@
 session_start();
 require_once 'db.php';
 
-
 if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
     header("Location: loginpage.html");
     exit();
@@ -12,6 +11,61 @@ $message = '';
 $messageType = '';
 
 
+if (isset($_GET['delete_id'])) {
+    $delete_id = intval($_GET['delete_id']);
+    
+    try {
+    
+        $check_stmt = $pdo->prepare("SELECT name FROM games WHERE id = ?");
+        $check_stmt->execute([$delete_id]);
+        $game = $check_stmt->fetch();
+        
+        if ($game) {
+            
+            $pdo->beginTransaction();
+            
+            $affected_summary = [];
+        
+            $delete_reviews_stmt = $pdo->prepare("DELETE FROM reviews WHERE game_id = ?");
+            $delete_reviews_stmt->execute([$delete_id]);
+            $reviews_affected = $delete_reviews_stmt->rowCount();
+            if ($reviews_affected > 0) {
+                $affected_summary[] = "Deleted $reviews_affected review(s)";
+            }
+            
+            $delete_owned_stmt = $pdo->prepare("DELETE FROM owned_games WHERE game_id = ?");
+            $delete_owned_stmt->execute([$delete_id]);
+            $owned_affected = $delete_owned_stmt->rowCount();
+            if ($owned_affected > 0) {
+                $affected_summary[] = "Removed from $owned_affected user library(s)";
+            }
+            
+            $delete_game_stmt = $pdo->prepare("DELETE FROM games WHERE id = ?");
+            $delete_game_stmt->execute([$delete_id]);
+            
+            $pdo->commit();
+            
+            $message = "Game '" . htmlspecialchars($game['name']) . "' has been deleted successfully!";
+            if (!empty($affected_summary)) {
+                $message .= " (" . implode(", ", $affected_summary) . ")";
+            }
+            $messageType = "success";
+            
+        } else {
+            $message = "Game not found!";
+            $messageType = "error";
+        }
+    } catch(PDOException $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        
+        $message = "Error deleting game: " . $e->getMessage();
+        $messageType = "error";
+    }
+}
+
+
 if ($_POST) {
     $name = trim($_POST['name']);
     $price = floatval($_POST['price']);
@@ -19,7 +73,6 @@ if ($_POST) {
     $rating = floatval($_POST['rating']);
     $developer = trim($_POST['developer']);
     $description = trim($_POST['description']);
-    
     
     if (empty($name) || empty($genre) || empty($developer) || empty($description)) {
         $message = "Please fill in all required fields!";
@@ -32,20 +85,17 @@ if ($_POST) {
         $messageType = "error";
     } else {
         try {
-        
             $stmt = $pdo->prepare("SELECT id FROM games WHERE name = ?");
             $stmt->execute([$name]);
             if ($stmt->fetch()) {
                 $message = "A game with this name already exists!";
                 $messageType = "error";
             } else {
-                
                 $stmt = $pdo->prepare("INSERT INTO games (name, price, genre, rating, developer, description) VALUES (?, ?, ?, ?, ?, ?)");
                 $stmt->execute([$name, $price, $genre, $rating, $developer, $description]);
                 
                 $message = "Game added successfully!";
                 $messageType = "success";
-                
                 
                 $_POST = array();
             }
@@ -55,7 +105,6 @@ if ($_POST) {
         }
     }
 }
-
 
 try {
     $games = $pdo->query("SELECT * FROM games ORDER BY created_at DESC")->fetchAll(PDO::FETCH_ASSOC);
@@ -364,6 +413,107 @@ try {
             letter-spacing: 0.5px;
         }
 
+        /* Delete button styles */
+        .delete-btn {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            transform: translateY(-1px);
+        }
+
+        .actions-column {
+            width: 100px;
+            text-align: center;
+        }
+
+        /* Confirmation modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: rgba(15, 23, 42, 0.98);
+            margin: 15% auto;
+            padding: 30px;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            color: #e2e8f0;
+        }
+
+        .modal h3 {
+            color: #ef4444;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .modal p {
+            color: #94a3b8;
+            margin-bottom: 25px;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn-confirm {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .btn-confirm:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        }
+
+        .btn-cancel {
+            background: rgba(30, 41, 59, 0.8);
+            color: #e2e8f0;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .btn-cancel:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: #3b82f6;
+        }
+
         @media (max-width: 768px) {
             .content-grid {
                 grid-template-columns: 1fr;
@@ -386,6 +536,15 @@ try {
             .nav-links {
                 flex-wrap: wrap;
                 justify-content: center;
+            }
+
+            .modal-content {
+                margin: 30% auto;
+                padding: 20px;
+            }
+
+            .modal-buttons {
+                flex-direction: column;
             }
         }
     </style>
@@ -496,6 +655,7 @@ try {
                                     <th>Rating</th>
                                     <th>Description</th>
                                     <th>Added</th>
+                                    <th class="actions-column">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -504,15 +664,20 @@ try {
                                     <td style="font-weight: 600; color: #e2e8f0;"><?php echo htmlspecialchars($game['name']); ?></td>
                                     <td><span class="genre-badge"><?php echo ucfirst(htmlspecialchars($game['genre'])); ?></span></td>
                                     <td style="color: #94a3b8;"><?php echo htmlspecialchars($game['developer']); ?></td>
-                                   <td class="price">
-    <?php 
-    $cleanPrice = (float)str_replace(['$', ','], '', $game['price']);
-    echo $cleanPrice == 0 ? 'Free' : '$' . number_format($cleanPrice, 2); 
-    ?>
-</td>
+                                    <td class="price">
+                                        <?php 
+                                        $cleanPrice = (float)str_replace(['$', ','], '', $game['price']);
+                                        echo $cleanPrice == 0 ? 'Free' : '$' . number_format($cleanPrice, 2); 
+                                        ?>
+                                    </td>
                                     <td class="rating"><?php echo number_format($game['rating'], 1); ?>/5</td>
                                     <td class="description" title="<?php echo htmlspecialchars($game['description']); ?>"><?php echo htmlspecialchars($game['description']); ?></td>
                                     <td style="color: #64748b; font-size: 12px;"><?php echo date('M d, Y', strtotime($game['created_at'])); ?></td>
+                                    <td class="actions-column">
+                                        <button class="delete-btn" onclick="confirmDelete(<?php echo $game['id']; ?>, '<?php echo htmlspecialchars(addslashes($game['name'])); ?>')">
+                                            Delete
+                                        </button>
+                                    </td>
                                 </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -523,8 +688,20 @@ try {
         </div>
     </main>
 
+
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <h3>Confirm Deletion</h3>
+            <p id="deleteMessage">Are you sure you want to delete this game? </p>
+            <div class="modal-buttons">
+                <a href="#" id="confirmDeleteBtn" class="btn-confirm">Yes, Delete</a>
+                <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Form validation
+
         document.querySelector('form').addEventListener('submit', function(e) {
             const name = document.getElementById('name').value.trim();
             const price = parseFloat(document.getElementById('price').value);
@@ -552,7 +729,6 @@ try {
             }
         });
         
-        // Auto-hide success messages
         const message = document.querySelector('.message.success');
         if (message) {
             setTimeout(() => {
@@ -562,6 +738,32 @@ try {
                 }, 300);
             }, 3000);
         }
+
+        function confirmDelete(gameId, gameName) {
+            const modal = document.getElementById('deleteModal');
+            const message = document.getElementById('deleteMessage');
+            const confirmBtn = document.getElementById('confirmDeleteBtn');
+            
+            message.innerHTML = `Are you sure you want to delete <strong>"${gameName}"</strong>?<br><br><span style="color: #fbbf24;">`;
+            confirmBtn.href = `admin-games.php?delete_id=${gameId}`;
+            
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('deleteModal');
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+
+
+
     </script>
 </body>
 </html>

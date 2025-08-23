@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Check if user is logged in (optional for news viewing)
+
 $isLoggedIn = isset($_SESSION['user_id']);
 ?>
 
@@ -353,7 +353,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
     </main>
 
     <script>
-// Full news articles data
+
 const newsArticles = {
     'breaking-gaming-expo': {
         title: '🔥 Breaking: Major Gaming Conference Announced',
@@ -535,12 +535,12 @@ const newsArticles = {
     }
 };
 
-// Filter functionality
+
 document.querySelectorAll('.filter-btn').forEach(btn => {
     btn.addEventListener('click', function() {
-        // Remove active class from all buttons
+    
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        // Add active class to clicked button
+      
         this.classList.add('active');
         
         const selectedFilter = this.textContent.trim();
@@ -566,7 +566,7 @@ function filterNewsCards(filter) {
         }
     });
     
-    // Always show featured news for 'All' and 'Industry' filters
+   
     if (filter === 'All' || filter === 'Industry') {
         featuredNews.style.display = 'grid';
     } else {
@@ -574,7 +574,7 @@ function filterNewsCards(filter) {
     }
 }
 
-// Create modal for full articles
+
 function createModal() {
     const modal = document.createElement('div');
     modal.id = 'newsModal';
@@ -596,7 +596,7 @@ function createModal() {
     
     document.body.appendChild(modal);
     
-    // Add modal styles
+   
     const modalStyles = document.createElement('style');
     modalStyles.textContent = `
         #newsModal {
@@ -737,7 +737,7 @@ function createModal() {
     
     document.head.appendChild(modalStyles);
     
-    // Close modal functionality
+    
     modal.querySelector('.modal-close').addEventListener('click', closeModal);
     modal.querySelector('.modal-overlay').addEventListener('click', function(e) {
         if (e.target === this) closeModal();
@@ -758,7 +758,7 @@ function openModal(articleKey, title, category, date) {
         document.getElementById('modalDate').textContent = article.date;
         document.getElementById('modalBody').innerHTML = article.content;
     } else {
-        // Fallback for articles without full content
+       
         document.getElementById('modalTitle').textContent = title;
         document.getElementById('modalCategory').textContent = category;
         document.getElementById('modalDate').textContent = date;
@@ -766,20 +766,20 @@ function openModal(articleKey, title, category, date) {
     }
     
     modal.style.display = 'block';
-    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    document.body.style.overflow = 'hidden';
 }
 
 function closeModal() {
     const modal = document.getElementById('newsModal');
     modal.style.display = 'none';
-    document.body.style.overflow = 'auto'; // Restore background scrolling
+    document.body.style.overflow = 'auto'; 
 }
 
-// Initialize modal when page loads
+
 document.addEventListener('DOMContentLoaded', function() {
     createModal();
     
-    // Add click handlers for read more buttons
+    
     const readMoreButtons = document.querySelectorAll('.read-more');
     readMoreButtons.forEach((button, index) => {
         button.addEventListener('click', function(e) {
@@ -791,15 +791,15 @@ document.addEventListener('DOMContentLoaded', function() {
             const category = newsCard.querySelector('.news-category').textContent;
             const date = newsCard.querySelector('.news-date').textContent;
             
-            // Map articles to their keys based on index or title
+            
             const articleKeys = [
-                'breaking-gaming-expo', // Featured article
-                'graphics-cards',       // First card
-                'console-wars',         // Second card  
-                'industry-revenue',     // Third card
-                'mobile-cloud',         // Fourth card
-                'indie-gems',          // Fifth card
-                'vr-gaming'            // Sixth card
+                'breaking-gaming-expo', 
+                'graphics-cards',       
+                'console-wars',           
+                'industry-revenue',     
+                'mobile-cloud',         
+                'indie-gems',          
+                'vr-gaming'            
             ];
             
             const articleKey = articleKeys[index] || null;
@@ -807,10 +807,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Add click handlers for news cards (optional - opens modal when clicking anywhere on card)
+    
     document.querySelectorAll('.news-card').forEach((card, index) => {
         card.addEventListener('click', function(e) {
-            // Don't trigger if clicking on read more button
+            
             if (e.target.classList.contains('read-more')) return;
             
             const title = card.querySelector('h3').textContent;
