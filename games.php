@@ -443,7 +443,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
         </div>
 
         <div class="games-grid" id="gamesGrid">
-            <!-- Featured Game -->
+           
             <div class="featured-game game-item" data-genre="action" data-name="valorant" data-price="Free to Play" data-rating="4.5" data-developer="Riot Games">
                 <div class="featured-image">
                     <img src="valorant.jpg" alt="Valorant" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -461,7 +461,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
                 </div>
             </div>
 
-            <!-- Row 1 -->
+           
             <div class="game-card game-item" data-genre="sports" data-name="fifa 26" data-price="$69.99" data-rating="4.6" data-developer="EA Sports">
                 <div class="game-image">
                     <img src="fifa 26.jpg" alt="FIFA 26" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -543,7 +543,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
                 </div>
             </div>
 
-            <!-- Row 2 -->
+          
             <div class="game-card game-item" data-genre="action" data-name="black myth wukong" data-price="$59.99" data-rating="4.7" data-developer="Game Science">
                 <div class="game-image">
                     <img src="blackmyth.jpg" alt="Black Myth: Wukong" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -625,7 +625,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
                 </div>
             </div>
 
-            <!-- Row 3 -->
+           
             <div class="game-card game-item" data-genre="simulation" data-name="minecraft" data-price="$29.99" data-rating="4.8" data-developer="Mojang Studios">
                 <div class="game-image">
                     <img src="mncrft.jpg" alt="Minecraft" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -682,7 +682,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
         </div>
     </main>
 
-    <!-- Notification -->
+   
     <div id="notification" class="notification"></div>
 
     <script>
@@ -877,7 +877,7 @@ System Requirements: Check store page for details`;
             });
         });
 
-        // Notification function
+       
         function showNotification(message, type = 'success') {
             const notification = document.getElementById('notification');
             notification.textContent = message;
@@ -889,7 +889,7 @@ System Requirements: Check store page for details`;
             }, 3000);
         }
 
-        // Initialize filters on page load
+       
         document.addEventListener('DOMContentLoaded', function() {
             applyFilters();
         });
